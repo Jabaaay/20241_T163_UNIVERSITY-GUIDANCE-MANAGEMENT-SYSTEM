@@ -6,7 +6,4 @@ Name of System: University Guidance Management System
 
 System description: Appointment Scheduling
 
-Name of Students: Jabay, Jovanne Diel
-                  Negre, Aira Maria
-                  Jordan, Mark Tristan
-                  Yañez, Noel Jr.
+Name of Students: Jabay, Jovanne Diel - Negre, Aira Maria - Jordan, Mark Tristan - Yañez, Noel Jr.
