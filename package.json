@@ -1,0 +1,18 @@
+{
+  "name": "20241_t163_university-guidance-management-system",
+  "version": "1.0.0",
+  "description": "Class Code: IT137 | T163",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app",
+    "dev": "nodemon app"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
