@@ -12,6 +12,7 @@ app.get('/login/admin', function (req, res) {
 
   app.get('/admin_dashboard', function (req, res) {
     res.send('Dashboard');
+    
   })
 
   app.get('/admin_appoinment', function (req, res) {
