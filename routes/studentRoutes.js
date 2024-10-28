@@ -22,3 +22,6 @@ router.put("/:id", updateAppointment);
 router.post("/", sendMessage);
 
 export default router;
+
+
+
