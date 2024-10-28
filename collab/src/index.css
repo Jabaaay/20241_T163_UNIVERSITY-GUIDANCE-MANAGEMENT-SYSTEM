@@ -1,0 +1,492 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins);
+*
+{ 
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: 'Poppins';
+   
+}
+body
+{
+  overflow: hidden;
+}
+nav
+{
+    width: 100%;
+    height: 75px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 50px;
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    background-color: #181F56;
+}
+
+.logo img
+{
+    font-size: 32px;
+    font-weight: bold;
+    width: 65px;
+    height: 65px;
+    -webkit-user-drag: none;
+    cursor: pointer;
+  
+}
+.menu
+{
+    width: 65%;
+    display: flex;
+    justify-content: right;
+    list-style: none;
+   
+}
+.menu li{
+    margin-left: 20px;
+    margin: 40px;
+}
+ .menu li a
+ {
+    font-size: 19px;
+    color: white;
+    font: bold;
+    text-decoration: none;
+    transition: 0.3s ease;
+    border: 1px solid transparent;
+    padding: 10px;
+ }
+ .menu li a:hover
+ {
+    background-color: red;
+    color: yellow;
+    border-radius: 5px;
+ }
+ .back
+ {
+  
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(assets/buksu.jpg);
+  background-repeat: no-repeat;
+  background-size: cover; 
+  background-position: center; 
+  background-attachment: fixed;
+ }
+
+
+.card
+{
+  margin: 175px auto;
+  border: 1px solid black;
+  width: 400px;
+  height: 370px;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: whitesmoke;
+
+}
+input
+{
+ 
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  margin: 10px 0;
+  border: 1px solid navy;
+  padding: 5px;
+}
+h1
+{
+ 
+  padding: 10px;
+}
+.h1
+{
+  text-align: center;
+}
+.buksu
+{
+  color: white;
+}
+
+.log:hover
+{
+  background-color: navy;
+  color: white;
+}
+.card1
+{
+
+  display: flex;
+
+
+}
+.card2
+{
+  width: 250px; /* Adjust width as needed */
+  height: 100vh; /* Full viewport height */
+  padding-top: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+  background-color: #000C6C;
+}
+
+
+
+.card3
+{
+  border: 1px solid black;
+  width: 83%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  height: 100vh;
+  margin: 80px auto;
+  
+}
+
+ul
+{
+  color: white;
+  margin: 75px auto;
+ 
+
+}
+li
+{
+  text-decoration: none;
+  list-style: none;
+  padding: 10px;
+  text-align: center;
+  font-size: larger;
+  cursor: pointer;
+  margin: 50px;
+}
+li:hover
+{
+  color: #FFB703;
+}
+.app
+{
+  display: flex;
+  margin: 20px auto;
+  padding: 10px;
+  justify-content: space-around;
+  
+}
+.type
+{
+  width: 500px;
+  height: 450px;
+  border: 1px solid black;
+  
+}
+.purpose
+{
+  width: 500px;
+  height: 450px;
+  border: 1px solid black;
+}
+.btn
+{
+  margin-top: -10px;
+  width: 200px;
+  background-color: #FFB703;
+  color: white;
+  border: none;
+  float: right;
+  margin-right: 65px;
+}
+
+h2
+{
+  padding: 15px;
+
+}
+.input1
+{
+  display: flex;
+  align-items: center;
+
+}
+.check
+{
+  width: 13px;
+  height: 13px;
+  margin: 15px;
+}
+h4
+{
+font-weight: 100;
+}
+.date
+{
+  box-sizing: border-box;
+  width: 90%;
+  text-align: center;
+
+}
+
+.btns
+{
+  display: flex;
+  padding: 20px;
+  
+}
+
+.t1
+{
+  border: 1px solid black;
+  width: 100%;
+  border-collapse: collapse;
+  padding: 10px;
+  height: 100%;
+}
+.th1, .tr1, .td1  
+{
+  width: 15%;
+  border: 1px solid black;
+  padding: 10px;
+  text-align: center;
+  
+  
+}
+
+.act
+{
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+
+}
+
+
+
+
+.log
+{
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  margin: 10px 0;
+  border: 1px solid navy;
+  padding: 5px;
+  margin-top: 70px;
+
+}
+.btns button
+{
+ width: 50%;
+  padding: 8px;
+  gap: 10px;
+  margin: 5px;
+  background-color: transparent;
+  border: 1px solid black;
+  cursor: pointer;
+  margin-top: -40px;
+}
+.btns button:hover
+{
+  background-color: #000C6C;
+  color: white;
+}
+.btn
+{
+  padding: 10px;
+}
+.btn:hover
+{
+  opacity: 0.7;
+  cursor: pointer;
+}
+.user
+{
+  font-size: 25px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  background-color: #FFB703;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.user:hover
+{
+  opacity: 0.9;
+  color: white;
+}
+
+.cal
+{
+
+
+  height: 70%;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 5px;
+  margin-top: -10px;
+
+}
+
+.edit
+{
+  color: #ffffff;
+  background-color: rgb(2, 165, 2);
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  border-radius: 5px;
+  
+}
+
+.del
+{
+  color: #ffffff;
+  background-color: rgb(255, 0, 0);
+  width: 25px;
+  height: 25px;
+  font-size: smaller;
+  cursor: pointer;
+  border-radius: 5px;
+  
+}
+
+.edit:hover
+{
+  opacity: 0.7;
+}
+
+.del:hover
+{
+  opacity: 0.7;
+}
+
+.prof-card
+{
+  border: 1px solid rgb(196, 196, 196);
+  width: 100%;
+  margin: 20px auto;
+  height: 60vh;
+  border-radius: 10px;
+  display: flex;
+}
+
+.prof-card1
+{
+  background-color: #eaeaea;
+  width: 25%;
+  height: 60vh;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.prof
+{
+  margin: 50px auto;
+
+}
+
+.prof button
+{
+  width: 150px;
+  height: 150px;
+  border: none;
+  border-radius: 100px;
+
+}
+
+.prof1 
+{
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.prof1 button
+{
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background-color: transparent;
+  text-align: left;
+  cursor: pointer;
+
+}
+
+.t2
+{
+  padding: 10px;
+ 
+  margin-left: 10px;
+  width: 98%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  color: #969595;
+
+
+}
+
+.prof-card2
+{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tr2
+{
+width: 100%;
+border-collapse: collapse;
+border-bottom: 1px solid rgb(198, 198, 198);
+}
+.th2, .td2
+{
+
+  border-collapse: collapse;
+  width: 50%;
+
+}
+
+span
+{
+  font-size: 25px;
+  margin: 20px auto;
+  padding: 10px;
+}
+.editBtn
+{
+  margin: 30px auto;
+  padding: 10px;
+  width: 30%;
+  border-radius: 5px;
+  border: none;
+  background-color: #FFB703;
+  color: white;
+  cursor: pointer;
+}
+.inp
+{
+  border: 1px solid transparent;
+  font-size: medium;
+
+}
+.editBtn:hover
+{
+  opacity: 0.7;
+}
+.inp1
+{
+
+  font-size: medium;
+}
