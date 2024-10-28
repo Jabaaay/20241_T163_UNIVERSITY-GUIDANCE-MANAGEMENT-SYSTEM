@@ -22,3 +22,5 @@ router.post("/", postAnnouncements);
 router.get("/", getMessage);
 
 export default router;
+
+
