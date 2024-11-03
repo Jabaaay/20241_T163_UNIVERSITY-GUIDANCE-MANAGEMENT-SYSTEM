@@ -10,6 +10,7 @@
 body
 {
   overflow: auto;
+  height: 50vh;
 }
 nav
 {
@@ -136,7 +137,6 @@ h1
 .card2
 {
   width: 250px; /* Adjust width as needed */
-  height: 100vh; /* Full viewport height */
   padding-top: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
   background-color: #000C6C;
@@ -167,9 +167,9 @@ li
   list-style: none;
   padding: 10px;
   text-align: center;
-  font-size: larger;
+  font-size: medium;
   cursor: pointer;
-  margin: 50px;
+  margin: 50px auto;
 }
 li:hover
 {
@@ -234,6 +234,13 @@ font-weight: 100;
   width: 90%;
   text-align: center;
 
+}
+
+.dropdown
+{
+  margin: 10px;
+  padding: 10px;
+  width: 100%;
 }
 
 .btns
@@ -545,15 +552,101 @@ hr
   padding: 10px;
 }
 
-.dropdown
-{
-  margin: 10px;
-  width: 100%;
-  padding: 10px;
-}
 .text-center
 {
   text-align: center;
   padding: 10px;
   color: #969595;
+}
+.dis
+{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dash
+{
+  width: 30%;
+  height: 200px;
+  border-radius: 5px;
+  color: white;
+  box-shadow: 0px 0 5px rgb(105, 105, 105);
+
+}
+.head
+{
+  display: flex;
+  justify-content: space-between;
+  
+  width: 100%;
+  align-items: center;
+}
+.opt1
+{
+  margin: 10px;
+  padding: 10px;
+  width: 300px;
+}
+
+.dat
+{
+  border: 1px solid black;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+  box-shadow: 1px 0 5px rgba(105, 105, 105, 0.7);
+}
+.chart
+{
+  border: 1px solid black;
+  margin: 10px;
+}
+.da
+{
+  text-align: center;
+  font-size: 50px;
+  color: #000C6C;
+}
+.da2 
+{
+  color: #8884d8;
+}
+.con
+{
+  background-color: #FFB703;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+}
+.con:hover
+{
+  opacity: 0.7;
+}
+.addStaff
+{
+  border: 1px solid black;
+  padding: 10px;
+  width: 500px;
+  border-radius: 5px;
+  box-shadow: 1px 0 5px rgba(105, 105, 105, 0.7);
+}
+
+.txtArea
+{
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  margin: 10px 0;
+  border: 1px solid navy;
+  padding: 5px;
+  font-size: medium;
+
+}
+
+.his
+{
+  display: flex;
+  justify-content: space-between;
 }

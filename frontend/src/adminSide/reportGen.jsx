@@ -1,32 +1,32 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import NavBar from './navbar'; // Import the NavBar component
-import Sidebar from './sidebar';
+import NavBar from './adminNavbar.jsx';
+//import Sidebar from './sidebar';
+import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Swal from "sweetalert2";
+import Sidebar from './adminSidebar.jsx';
 
 
+function Dashboard() {
 
-function History() {
-
-   
-  return (
-  
-    <>
-    <NavBar />
-  <div className="card1">
-  <Sidebar />
-    <div className="card3">
+    return (
+        <>
+            <NavBar />
+            <div className="card1">
+                <Sidebar />
+                <div className="card3">
 
       <div className="his">
-        <h1>History</h1>
+        <h1>Reports</h1>
 
         <select name="" id="" className='opt1'>
-                                    <option value="">Select Month</option>
-                                    <option value="">Jan 1 - Dec 31 2020</option>
-                                    <option value="">Jan 1 - Dec 31 2021</option>
-                                    <option value="">Jan 1 - Dec 31 2022</option>
-                                    <option value="">Jan 1 - Dec 31 2023</option>
-                                    <option value="">Jan 1 - Dec 31 2024</option>
-                                    <option value="">Jan 1 - Dec 31 2025</option>
+                                    <option value="">Select College</option>
+                                    <option value="">COT</option>
+                                    <option value="">COB</option>
+                                    <option value="">CPAG</option>
+                                    <option value="">CON</option>
+                                    <option value="">COE</option>
+                                    <option value="">CAS</option>
                                     
                                 </select>
 
@@ -58,21 +58,10 @@ function History() {
         </div>
         
     </div>
-    
-  </div>
-
-  
-
-
-  </>
-    
-    
-  );
-
-
-
-
-
+                
+            </div>
+        </>
+    );
 }
 
-export default History;
+export default Dashboard;

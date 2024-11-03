@@ -10,6 +10,14 @@ import Profile from './profile';
 import Edit_Profile from './edit_profile'
 import {gapi} from 'gapi-script';
 import Logins from "./session/login";
+import AdminPanel from "./adminSide/adminDashboard"
+import StudentApp from "./adminSide/studentApp"
+import AddStaff from "./adminSide/addStaff"
+import Post from "./adminSide/postAnnoucement"
+import Report from "./adminSide/reportGen"
+import Panel from "./adminSide/adminPanel"
+import AdminProfile from "./adminSide/adminProfile"
+import AdminEditProfile from "./adminSide/editProfile"
 
 
 
@@ -27,6 +35,10 @@ function Login() {
 
     navigate('/dashboard');  
   };
+
+  const loginAdmin = () => {
+    navigate('/adminDashboard');
+  }
 
   return (
     <>
@@ -50,7 +62,7 @@ function Login() {
           
           <Logins className="log1" />
 
-          <a className='ad' href="">Admin</a>
+          <a className='ad' href="" onClick={loginAdmin}>Admin</a>
 
           
         </div>
@@ -66,12 +78,21 @@ function App() {
     <Router>
       <Routes>
         
+      <Route path="/adminPanel" element={<Panel />} /> 
+      <Route path="/editProfile" element={<AdminEditProfile />} />
+        <Route path="/adminDashboard" element={<AdminPanel />} /> 
+        <Route path="/adminProfile" element={<AdminProfile />} /> 
+        <Route path="/studentApp" element={<StudentApp />} /> 
+        <Route path="/postAnnouncements" element={<Post /> } />
+        <Route path="/reportGen" element={<Report /> } />
+        <Route path="/addStaff" element={<AddStaff />} /> 
         <Route path="/" element={<Login />} /> 
         <Route path="/dashboard" element={<Dashboard />} />  
         <Route path="/history" element={<History />} />  
         <Route path="/status" element={<Status />} /> 
         <Route path="/profile" element={<Profile />} /> 
         <Route path="/edit_profile" element={<Edit_Profile />} /> 
+
       </Routes>
     </Router>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import NavBar from './navbar';
-import Sidebar from './sidebar';
+import NavBar from './adminNavbar';
+import Sidebar from './adminSidebar';
 import { MdEdit, MdDelete } from "react-icons/md";
 
 function Status() {
@@ -9,7 +9,7 @@ function Status() {
 
     const fetchAppointments = async () => {
         try {
-            const response = await fetch('http://localhost:3001'); // Replace with your API endpoint
+            const response = await fetch('http://localhost:3001/');
             if (!response.ok) {
                 throw new Error('Failed to fetch appointments');
             }
@@ -30,7 +30,7 @@ function Status() {
             <div className="card1">
                 <Sidebar />
                 <div className="card3">
-                    <h1>Status</h1>
+                    <h1>Appointments</h1>
                     <div className="app">
                         <table className='t1'>
                             <thead>
@@ -40,7 +40,6 @@ function Status() {
                                     <th className='th1'>Purpose</th>
                                     <th className='th1'>Date</th>
                                     <th className='th1'>Time</th>
-                                    <th className='th1'>Status</th>
                                     <th className='th1'>Actions</th>
                                 </tr>
                             </thead>
@@ -53,13 +52,7 @@ function Status() {
                                             <td className='td1'>{appointment.purpose}</td>
                                             <td className='td1'>{appointment.date}</td>
                                             <td className='td1'>{appointment.time}</td>
-                                            <td className='td1'>{appointment.status}</td>
-                                            <td className='td1'>
-                                                <div className="act">
-                                                    <MdEdit className='edit' />
-                                                    <MdDelete className='del' />
-                                                </div>
-                                            </td>
+                                            <td className='td1'><button className='con'>Confirm</button></td>
                                         </tr>
                                     ))
                                 ) : (

@@ -20,6 +20,10 @@ const studentSchema = new Schema({
     time: {
         type: String,
         required: true
+    },
+    status: { 
+        type: String, 
+        default: 'Waiting for Approval'
     }
 
 })
