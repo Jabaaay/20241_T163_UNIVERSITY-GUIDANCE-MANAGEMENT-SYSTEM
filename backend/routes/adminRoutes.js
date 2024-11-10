@@ -1,19 +1,24 @@
 import express from "express";
-import { addStaff, getHistory, getPendingAppointments, confirmAppointment } from "../controllers/adminControllers";
+import {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin} from '../controllers/adminControllers.js'
+import multer from "multer";
+
 
 const router = express.Router();
 
-// Route to add a new staff member
-router.post('/', addStaff);
+router.get('/appointments', getHistory);
 
-// Route to get all appointment history
-router.get('/', getHistory);
 
-// Route to get pending appointments
-router.get('/', getPendingAppointments);
+// router.put('/:id', confirmAppointment);
 
-// Route to confirm a specific appointment by ID
 router.put('/confirm/:id', confirmAppointment);
 
+
+const upload = multer({ dest: 'uploads/' });
+
+router.post('/announcements', upload.single('file'), createAnnouncement);
+
+router.get('/announcements', getAnnouncements);
+
+router.post('/google-login', handleGoogleLogin);
 
 export default router;

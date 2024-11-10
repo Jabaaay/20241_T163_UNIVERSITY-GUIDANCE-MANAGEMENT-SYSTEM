@@ -1,40 +1,18 @@
-import Admin from "../models/adminModels.js";
-import StudentApp from "../models/studentApp.js";
-import confirmAppointment from '../models/confirmApp.js'; // New model
-
-// Controller to add a new staff member
-const addStaff = async (req, res) => {
-    try {
-        const adminStaff = new Admin(req.body);
-        const saved = await adminStaff.save();
-        res.status(200).json(saved);
-    } catch (error) {
-        console.error("Error adding staff:", error);
-        res.status(500).json({ message: "Error adding staff" });
-    }
-};
-
-// Controller to get all appointment history
+import StudentApp from "../models/studentApp.js"
+import Announcement from '../models/annoucementModels.js';
+import User from "../models/users.js";
+// get all appointments by the student
 const getHistory = async (req, res) => {
     try {
         const studentApp = await StudentApp.find();
-        res.status(200).json(studentApp);
-    } catch (error) {
-        console.error("Error retrieving appointment history:", error);
-        res.status(500).json({ message: "Error retrieving appointment history" });
-    }
-};
 
-// Controller to get pending appointments
-const getPendingAppointments = async (req, res) => {
-    try {
-        const pendingAppointments = await StudentApp.find({ status: 'Waiting for Approval' });
-        res.status(200).json(pendingAppointments);
+        
+        res.send(studentApp);
+
     } catch (error) {
-        console.error("Error fetching pending appointments:", error);
-        res.status(500).json({ message: "Failed to fetch pending appointments" });
+        console.log(error)
     }
-};
+}
 
 
 const confirmAppointment = async (req, res) => {
@@ -47,5 +25,53 @@ const confirmAppointment = async (req, res) => {
     }
 };
 
+const createAnnouncement = async (req, res) => {
+    try {
+        const { header, content } = req.body;
+        let fileUrl = '';
 
-export { addStaff, getHistory, getPendingAppointments, confirmAppointment };
+        if (req.file) {
+            fileUrl = req.file.path; // Assuming you're using multer for file uploads
+        }
+
+        const announcement = new Announcement({ header, content, fileUrl });
+        await announcement.save();
+        res.status(201).json({ message: 'Announcement created successfully', announcement });
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while creating the announcement' });
+    }
+};
+
+const getAnnouncements = async (req, res) => {
+    try {
+        const announcements = await Announcement.find();
+        res.status(200).json(announcements);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching announcements' });
+    }
+};
+
+const handleGoogleLogin = async (req, res) => {
+    const { googleId, name, email, picture } = req.body;
+  
+    try {
+      // Check if user already exists
+      let user = await User.findOne({ googleId });
+      if (!user) {
+        // Create new user if not found
+        user = new User({ googleId, name, email, picture });
+        await user.save();
+      }
+  
+      // Respond with user data (or token if using JWT)
+      res.status(200).json({ message: 'Login successful', user });
+    } catch (error) {
+      console.error('Google login error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
+
+
+export {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin};

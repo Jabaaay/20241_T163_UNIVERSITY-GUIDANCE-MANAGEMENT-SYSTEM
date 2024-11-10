@@ -18,8 +18,13 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Apply CORS middleware here
 app.use(express.json()); // Middleware to parse JSON payloads
 
+// Import routes
 import studentRoute from './routes/studentApp.js';
+import adminRoute from './routes/adminRoutes.js';
+
+// Use routes
 app.use('/', studentRoute);
+app.use('/admin', adminRoute);
 
 
 // Database connection

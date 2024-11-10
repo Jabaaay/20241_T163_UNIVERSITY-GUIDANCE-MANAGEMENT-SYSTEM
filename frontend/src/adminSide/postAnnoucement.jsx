@@ -14,7 +14,7 @@ function Status() {
         // Fetch existing announcements
         const fetchAnnouncements = async () => {
             try {
-                const response = await fetch('http://localhost:3001/announcements');
+                const response = await fetch('http://localhost:3001/admin/announcements');
                 if (response.ok) {
                     const data = await response.json();
                     setAnnouncements(data);
@@ -33,7 +33,7 @@ function Status() {
         if (file) formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:3001/announcements', {
+            const response = await fetch('http://localhost:3001/admin/announcements', {
                 method: 'POST',
                 body: formData,
             });

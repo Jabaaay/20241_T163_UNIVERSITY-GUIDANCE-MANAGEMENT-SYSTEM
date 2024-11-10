@@ -66,33 +66,6 @@ const updateApp = async (req, res) => {
     }
 }
 
-const confirmAppointment = async (req, res) => {
-    try {
-        const { id } = req.params;
-        await StudentApp.findByIdAndUpdate(id, { status: 'Confirmed' });
-        res.status(200).json({ message: 'Appointment confirmed' });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to confirm appointment' });
-    }
-};
-
-const createAnnouncement = async (req, res) => {
-    try {
-        const { header, content } = req.body;
-        let fileUrl = '';
-
-        if (req.file) {
-            fileUrl = req.file.path; // Assuming you're using multer for file uploads
-        }
-
-        const announcement = new Announcement({ header, content, fileUrl });
-        await announcement.save();
-        res.status(201).json({ message: 'Announcement created successfully', announcement });
-    } catch (error) {
-        res.status(500).json({ error: 'An error occurred while creating the announcement' });
-    }
-};
-
 const getAnnouncements = async (req, res) => {
     try {
         const announcements = await Announcement.find();
@@ -125,4 +98,4 @@ const handleGoogleLogin = async (req, res) => {
 
 
 
-export {getHistory, addApp, cancelApp, updateApp, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin};
+export {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin};

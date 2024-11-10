@@ -855,4 +855,20 @@ font-weight: bolder;
 {
   text-decoration: none;
 }
+.download-btn
+{
+  margin: 10px;
+  padding: 10px;
+  margin-bottom: -10px;
+  margin-top: -5px;
+  width: 20%;
+  border-radius: 10px;
+  border: none;
+  background-color: #FFB703;
+  color: white;
+}
+.download-btn:hover
+{
+opacity: 0.7;
+}
 

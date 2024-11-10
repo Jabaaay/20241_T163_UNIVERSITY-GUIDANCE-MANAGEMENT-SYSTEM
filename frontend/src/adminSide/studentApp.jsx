@@ -10,7 +10,7 @@ function Status() {
     // Fetch appointments
     const fetchAppointments = async () => {
         try {
-            const response = await fetch('http://localhost:3001/appointments'); // Your specified endpoint
+            const response = await fetch('http://localhost:3001/admin/appointments'); // Your specified endpoint
             if (!response.ok) throw new Error('Failed to fetch appointments');
             const data = await response.json();
             setAppointments(data);
@@ -21,7 +21,7 @@ function Status() {
 
     const handleConfirm = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3001/confirm/${id}`, { method: 'PUT' });
+            const response = await fetch(`http://localhost:3001/admin/confirm/${id}`, { method: 'PUT' });
             if (!response.ok) throw new Error('Failed to confirm appointment');
             
             // Update state by changing the status to "Confirmed"

@@ -12,7 +12,7 @@ const Dashboard = () => {
     // Fetch appointments and categorize them
     const fetchAppointments = async () => {
         try {
-            const response = await fetch('http://localhost:3001/appointments');
+            const response = await fetch('http://localhost:3001/admin/appointments');
             if (!response.ok) {
                 throw new Error('Failed to fetch appointments');
             }
