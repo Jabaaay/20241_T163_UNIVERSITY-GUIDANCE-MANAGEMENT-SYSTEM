@@ -1,36 +1,19 @@
 import express from "express";
-import { addStaff, getHistory } from "../controllers/adminControllers";
-import Appointment from "../models/studentApp";
+import { addStaff, getHistory, getPendingAppointments, confirmAppointment } from "../controllers/adminControllers";
 
 const router = express.Router();
 
-router.get('/', getHistory);
-
+// Route to add a new staff member
 router.post('/', addStaff);
 
-router.put('/studentApp/:id', async (req, res) => {
-    try {
-        const appointmentId = req.params.id;
-        const { status } = req.body; // Get the new status from the request body
+// Route to get all appointment history
+router.get('/', getHistory);
 
-        // Find and update the appointment
-        const updatedAppointment = await Appointment.findByIdAndUpdate(
-            appointmentId,
-            { status: status }, // Update the status
-            { new: true } // Return the updated document
-        );
+// Route to get pending appointments
+router.get('/', getPendingAppointments);
 
-        if (!updatedAppointment) {
-            return res.status(404).json({ message: 'Appointment not found' });
-        }
-
-        res.status(200).json(updatedAppointment); // Return the updated appointment
-    } catch (error) {
-        console.error('Error confirming appointment:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
+// Route to confirm a specific appointment by ID
+router.put('/confirm/:id', confirmAppointment);
 
 
 export default router;

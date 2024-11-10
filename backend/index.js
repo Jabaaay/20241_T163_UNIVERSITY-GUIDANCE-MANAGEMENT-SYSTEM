@@ -11,7 +11,7 @@ const PORT = process.env.PORT;
 
 // Middleware for CORS
 const corsOptions = {
-    origin: ["http://localhost:5173"], // Adjust this to your frontend's origin
+    origin: ["http://localhost:5173"], 
     credentials: true,
 };
 

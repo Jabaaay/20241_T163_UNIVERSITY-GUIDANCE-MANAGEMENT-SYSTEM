@@ -30,7 +30,7 @@ function Dashboard() {
     const handleAddStudentApp = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3001/', {
+            const response = await fetch('http://localhost:3001/appointments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ function Dashboard() {
 
         Swal.fire({
             icon: 'success',
-            title: 'Appoinment Successfully',
+            title: 'Success',
             text: 'Just Wait for the Approval',
             confirmButtonText: 'OK',
             confirmButtonColor: '#FFB703',
@@ -110,15 +110,7 @@ function Dashboard() {
                             <h2>Select Date and Time</h2>
                             
                             <div className="input1">
-                            <select className='dropdown' name="date" value={newStudentApp.date} onChange={handleInputChange}>
-                                    <option value="">Select a date</option>
-                                    <option value="8 - 9:00am">8 - 9:00 am</option>
-                                    <option value="9 - 10:00am">9 - 10:00 am</option>
-                                    <option value="10 - 11:00am">10 - 11:00 am</option>
-                                    <option value="1 - 2:00pm">1 - 2:00 pm</option>
-                                    <option value="2 - 3:00pm">2 - 3:00 pm</option>
-                                    <option value="3 - 4:00pm">3 - 4:00 pm</option>
-                                </select>
+                                <input className='dropdown' type="date" name='date' value={newStudentApp.date} onChange={handleInputChange} />
                                 </div>
 
                             <div className="input1">
@@ -134,6 +126,7 @@ function Dashboard() {
                             </div>
                         </div>
                     </div>
+                    
                     <button className='btn' onClick={onAppointment}>Confirm</button>
                     
                     </form>

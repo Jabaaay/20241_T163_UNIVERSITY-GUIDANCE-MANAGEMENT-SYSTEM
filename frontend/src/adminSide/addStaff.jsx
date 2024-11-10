@@ -5,24 +5,6 @@ import Sidebar from './adminSidebar';
 import { MdEdit, MdDelete } from "react-icons/md";
 
 function Status() {
-    const [appointment, setAppointments] = useState([]); // State to store appointments
-
-    const fetchAppointments = async () => {
-        try {
-            const response = await fetch('http://localhost:3001');
-            if (!response.ok) {
-                throw new Error('Failed to fetch appointments');
-            }
-            const data = await response.json();
-            setAppointments(data);
-        } catch (error) {
-            console.error('Error fetching appointments:', error);
-        }
-    };
-
-    useEffect(() => {
-        fetchAppointments(); // Fetch appointments when component mounts
-    }, []);
 
     return (
         <>

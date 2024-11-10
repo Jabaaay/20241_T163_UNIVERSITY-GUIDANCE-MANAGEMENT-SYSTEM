@@ -79,13 +79,13 @@ nav
 .card
 {
   margin: 175px auto;
-  border: 1px solid black;
   width: 400px;
   box-sizing: border-box;
   padding: 10px;
   border-radius: 5px;
   font-family: Arial, Helvetica, sans-serif;
   background-color: whitesmoke;
+  box-shadow: 0px 0 5px rgba(0, 0, 0, 0.5); 
 
 }
 .in
@@ -136,9 +136,9 @@ h1
 }
 .card2
 {
-  width: 250px; /* Adjust width as needed */
+  width: 250px;
   padding-top: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
   background-color: #000C6C;
 }
 
@@ -241,6 +241,7 @@ font-weight: 100;
   margin: 10px;
   padding: 10px;
   width: 100%;
+  border-radius: 5px;
 }
 
 .btns
@@ -512,13 +513,12 @@ span
 
   font-size: medium;
 }
-/* styles.css */
 
 #signIn {
   display: flex;
-  justify-content: center; /* Center the button horizontally */
-  align-items: center; /* Center the button vertically */
-  background-color: #f5f5f5; /* Light background color */
+  justify-content: center; 
+  align-items: center; 
+  background-color: #f5f5f5; 
 
 }
 
@@ -587,6 +587,7 @@ hr
   margin: 10px;
   padding: 10px;
   width: 300px;
+  border-radius: 5px;
 }
 
 .dat
@@ -650,3 +651,208 @@ hr
   display: flex;
   justify-content: space-between;
 }
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+
+}
+.time
+{
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+}
+.modal-content h2 {
+  margin-top: 0;
+}
+.modal-content input {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}
+.modal-content button {
+  margin: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.tab-select
+{
+  margin-left: 10px;  
+  padding: 10px;
+  width: 20%;
+}
+
+.order-list
+{
+  color: black;
+  display: flex;
+  color: white;
+  width: 100%;
+  justify-content: right;
+}
+.order-list li
+{
+  font-size: larger;
+  margin: 10px;
+  padding: 20px;
+
+}
+
+.landing-page
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.logo1 img
+{
+    font-weight: bold;
+    width: 500px;
+    height: 500px;
+    -webkit-user-drag: none;
+    cursor: pointer;
+  
+}
+
+.buksu
+{
+  color:#000C6C;
+  font-size: 60px;
+}
+.cont 
+{
+  color: #000C6C;
+  width: 70%;
+  margin: 10px;
+}
+.login-button
+{
+  margin: 10px;
+  height: 50px;
+  width: 200px;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  background-color: #FFB703;
+  font-size: large;
+  cursor: pointer;
+}
+.login-button:hover
+{
+  opacity: 0.7;
+}
+.section {
+
+  height: 100vh;
+  scroll-margin-top: 80px; 
+}
+.ann 
+{
+  margin: 10px;
+  font-size: 35px;
+  text-align: center;
+}
+
+.footer {
+  background-color: #181F56;
+  color: white;
+  font-size: smaller;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-content
+{
+  display: flex;
+  justify-content: space-between;
+}
+.an
+{
+  display: flex;
+  justify-content: space-evenly;
+  padding: 10px;
+  gap: 10px;
+  height: 60%;
+}
+.announcement-card
+{
+  border: 1px solid black;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 23%;
+  border-radius: 10px;
+
+}
+
+.images
+{
+  width: 300px;
+  height: 200px;
+  margin: 5px 0;
+  border-radius: 20px;
+  -webkit-user-drag: none;
+}
+.images:hover
+{
+  opacity: 0.7;
+}
+.heads
+{
+font-weight: bolder;
+
+}
+.or 
+{
+  text-align: center;
+  
+}
+.recaptcha
+{
+  width: 100%;
+  margin-bottom: -25px;
+}
+.ad
+{
+  text-decoration: none;
+  font-size: smaller;
+}
+.log-btn
+{
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  text-decoration: none;
+}
+.log-btn a 
+{
+  text-decoration: none;
+}
+
