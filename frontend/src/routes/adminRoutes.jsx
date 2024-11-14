@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminPanel from "../adminSide/adminDashboard";
 import StudentApp from "../adminSide/studentApp";
-import AddStaff from "../adminSide/addStaff";
+import AddStaff from "../adminSide/staff";
 import Post from "../adminSide/postAnnoucement";
 import Report from "../adminSide/reportGen";
 import Panel from "../adminSide/adminPanel";

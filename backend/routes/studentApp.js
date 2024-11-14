@@ -1,5 +1,5 @@
 import express from "express";
-import {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin} from '../controllers/studentApp.js'
+import {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin, logoutController, updateProfile} from '../controllers/studentApp.js'
 import multer from "multer";
 
 
@@ -16,6 +16,10 @@ router.put('/appointments/:id', updateApp);
 router.get('/announcements', getAnnouncements);
 
 router.post('/google-login', handleGoogleLogin);
+
+router.put('/update-profile/:googleId', updateProfile);
+
+router.post('/logout', logoutController);
 
 
 export default router;

@@ -14,7 +14,7 @@ function Sidebar() {
   return (
     <div className="card2">
       <ul>
-        <li onClick={() => handleNavigation('/dashboard')}>Appointment</li>
+        <li onClick={() => handleNavigation('/dashboard')}>My Appointment</li>
         <li onClick={() => handleNavigation('/history')}>View History</li>
         <li onClick={() => handleNavigation('/status')}>Status</li>
         <li><Logout /></li>

@@ -2,11 +2,15 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import session from "express-session";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
+
+
+
 
 
 // Middleware for CORS
@@ -17,6 +21,19 @@ const corsOptions = {
 
 app.use(cors(corsOptions)); // Apply CORS middleware here
 app.use(express.json()); // Middleware to parse JSON payloads
+
+app.use(session({
+    secret: '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',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Import the logout routes
+import logoutRoutes from './routes/studentApp.js'
+
+// Use the logout routes
+app.use(logoutRoutes);
+
 
 // Import routes
 import studentRoute from './routes/studentApp.js';

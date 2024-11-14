@@ -25,6 +25,7 @@ function Status() {
         };
         fetchAnnouncements();
     }, []);
+    
 
     const handlePost = async () => {
         const formData = new FormData();

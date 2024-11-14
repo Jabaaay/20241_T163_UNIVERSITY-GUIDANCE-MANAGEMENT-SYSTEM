@@ -147,8 +147,6 @@ function Status() {
                                 )}
                             </tbody>
                         </table>
-
-                        {/* Pop-up Card for Editing Appointment */}
                         {isEditing && (
                             <div className="modal">
                                 <div className="modal-content">

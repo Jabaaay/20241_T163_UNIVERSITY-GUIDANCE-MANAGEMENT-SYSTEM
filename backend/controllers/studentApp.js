@@ -76,26 +76,64 @@ const getAnnouncements = async (req, res) => {
 };
 
 const handleGoogleLogin = async (req, res) => {
-    const { googleId, name, email, picture } = req.body;
+    const { googleId, name, email, picture, course, department } = req.body;
   
     try {
-      // Check if user already exists
       let user = await User.findOne({ googleId });
+  
       if (!user) {
-        // Create new user if not found
-        user = new User({ googleId, name, email, picture });
+        // Create a new user if they don't exist
+        user = new User({ googleId, name, email, picture, course, department });
+        await user.save();
+      } else {
+        // Update the existing user
+        user.course = course || user.course;
+        user.department = department || user.department;
         await user.save();
       }
   
-      // Respond with user data (or token if using JWT)
-      res.status(200).json({ message: 'Login successful', user });
+      res.status(200).json({ user });
     } catch (error) {
-      console.error('Google login error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Server error' });
     }
   };
 
+  const updateProfile = async (req, res) => {
+    const { googleId } = req.params; // Get the googleId from URL parameter
+    const { course, department } = req.body; // Extract course and department from the request body
+  
+    try {
+      // Find the user by googleId and update the profile
+      const updatedUser = await User.findOneAndUpdate(
+        { googleId },
+        { course, department },
+        { new: true } // Return the updated document
+      );
+  
+      // If user not found, send a 404 response
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Return the updated user data
+      res.status(200).json(updatedUser);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Error updating profile' });
+    }
+  };
+
+  const logoutController = (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Could not log out' });
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.json({ success: true, message: 'Logged out' });
+    });
+};
 
 
 
-export {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin};
+
+export {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin, logoutController, updateProfile};

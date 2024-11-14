@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import logo from './assets/book.png';
 import logo1 from './assets/1.png';
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -65,30 +66,41 @@ const LandingPage = () => {
       </section>
 
       <section id="announcements-section" className="section">
-        <h1 className='ann'>Announcements</h1>
-        <div className="an">
-          {visibleAnnouncements.length > 0 ? (
-            visibleAnnouncements.map((announcement) => (
-              <div key={announcement._id} className="announcement-card">
-                {announcement.fileUrl && 
-                <img className='images' src={logo} alt="Announcement" />}
-                <p className='heads'>{announcement.header}</p>
-                <p className='conts'>{announcement.content}</p>
-              </div>
-            ))
-          ) : (
-            <p>No announcements available</p>
-          )}
-        </div>
-
-        {announcements.length > 4 && !showMore && (
-          <button className="see-more-button" onClick={() => setShowMore(true)}>See More</button>
+      <h1 className="ann">Announcements</h1>
+      <div className="an">
+        {visibleAnnouncements.length > 0 ? (
+          visibleAnnouncements.map((announcement, index) => (
+            <motion.div
+              key={announcement._id}
+              className="announcement-card"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+            >
+              {announcement.fileUrl && (
+                <img className="images" src={logo} alt="Announcement" />
+              )}
+              <p className="heads">{announcement.header}</p>
+              <p className="conts">{announcement.content}</p>
+            </motion.div>
+          ))
+        ) : (
+          <p>No announcements available</p>
         )}
+      </div>
 
-        {showMore && announcements.length > 4 && (
-          <button className="see-more-button" onClick={() => setShowMore(false)}>See Less</button>
-        )}
-      </section>
+      {announcements.length > 4 && !showMore && (
+        <button className="see-more-button" onClick={() => setShowMore(true)}>
+          See More
+        </button>
+      )}
+
+      {showMore && announcements.length > 4 && (
+        <button className="see-more-button" onClick={() => setShowMore(false)}>
+          See Less
+        </button>
+      )}
+    </section>
 
       <section id="contact-section" className="section">
         <h1 className='ann'>Contact Us</h1>
