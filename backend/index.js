@@ -43,6 +43,9 @@ import adminRoute from './routes/adminRoutes.js';
 app.use('/', studentRoute);
 app.use('/admin', adminRoute);
 
+app.use('/uploads', express.static('uploads'));
+
+
 
 // Database connection
 const connect = async () => {

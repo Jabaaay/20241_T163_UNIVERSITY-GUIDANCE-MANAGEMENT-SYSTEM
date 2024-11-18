@@ -16,15 +16,23 @@ const getHistory = async (req, res) => {
 
 // student can add appointment
 const addApp = async (req, res) => {
-    try {
-        const student = new StudentApp(req.body);
-        const saved = await student.save();
-        res.status(200).json(saved);
-        
-    } catch (error) {
-        console.log(error)
-    }
-}
+  try {
+      // Assuming you pass the user data from the frontend
+      const userName = req.body.userName; // Retrieve user name from the request body
+      
+      // Include userName when creating a new appointment
+      const student = new StudentApp({
+          ...req.body,
+          userName: userName // Add userName field
+      });
+      const saved = await student.save();
+      res.status(200).json(saved);
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Failed to add appointment' });
+  }
+};
+
 
 // student can delete or cancel the appointment
 const cancelApp = async (req, res) => {
