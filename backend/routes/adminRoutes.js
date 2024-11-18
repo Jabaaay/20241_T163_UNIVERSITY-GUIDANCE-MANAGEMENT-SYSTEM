@@ -1,5 +1,5 @@
 import express from "express";
-import {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile} from '../controllers/adminControllers.js'
+import {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications} from '../controllers/adminControllers.js'
 import multer from "multer";
 
 
@@ -33,5 +33,7 @@ router.post('/google-login', handleGoogleLogin);
 router.put('/update-profile/:googleId', updateProfile);
 
 router.post('/add', addStaff);
+
+router.get('/contact', getNotifications);
 
 export default router;

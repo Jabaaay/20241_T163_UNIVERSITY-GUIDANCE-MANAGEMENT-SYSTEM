@@ -4,6 +4,8 @@ import User from "../models/users.js";
 import Staff from '../models/staffModels.js';
 import nodemailer from 'nodemailer';
 import Admin from "../models/admin.js";
+import Concerns from '../models/concerns.js';
+
 // get all appointments by the student
 const getHistory = async (req, res) => {
     try {
@@ -149,8 +151,24 @@ const addStaff = async (req, res) => {
   }
 };
 
+const getNotifications = async (req, res) => {
+  try {
+    // Fetch notifications from the database
+    const notifications = await Concerns.find(); // Adjust the query as needed (e.g., limit or filter)
+    
+    if (!notifications) {
+      return res.status(404).json({ message: 'No notifications found' });
+    }
+
+    res.status(200).json(notifications); // Send notifications as a response
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 
 
 
-export {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile};
+
+export {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications};

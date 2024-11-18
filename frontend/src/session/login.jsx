@@ -15,6 +15,35 @@ function Logins() {
   const [recaptchaValue, setRecaptchaValue] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
+  // Initialize the Google API client once component is mounted
+  useEffect(() => {
+    const loadGoogleAPI = () => {
+      window.gapi.load("client:auth2", initClient);
+    };
+
+    if (window.gapi) {
+      loadGoogleAPI();
+    } else {
+      // Google API script not loaded yet, add event listener to check when it's ready
+      const script = document.createElement('script');
+      script.src = "https://apis.google.com/js/api.js";
+      script.onload = loadGoogleAPI;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  const initClient = () => {
+    window.gapi.client.init({
+      apiKey: 'AIzaSyA_viGY4c2LAW1tXrIxGI5KDohhibrH52E', // Replace with your API key
+      clientId: clientId, // Use your client ID
+      scope: "https://www.googleapis.com/auth/calendar",
+    }).then(() => {
+      const authInstance = window.gapi.auth2.getAuthInstance();
+      if (!authInstance.isSignedIn.get()) {
+        authInstance.signIn();
+      }
+    });
+  };
 
   const handleSuccess = async (response) => {
     console.log("Login successful", response);

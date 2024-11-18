@@ -3,12 +3,64 @@ import logo from './assets/book.png';
 import logo1 from './assets/1.png';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState([]);
   const [showMore, setShowMore] = useState(false);
   const [loading, setLoading] = useState(true); // New loading state
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const contactData = { fullName, email, message };
+
+    try {
+      const response = await fetch('http://localhost:3001/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Success alert
+        Swal.fire({
+          title: 'Success!',
+          text: data.message,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+        setFullName('');
+        setEmail('');
+        setMessage('');
+      } else {
+        // Error alert
+        Swal.fire({
+          title: 'Error!',
+          text: data.error || 'Something went wrong.',
+          icon: 'error',
+          confirmButtonText: 'Try Again'
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Network error alert
+      Swal.fire({
+        title: 'Network Error!',
+        text: 'Please try again later.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
+  };
 
   const handleLoginClick = () => {
     navigate('/login');
@@ -170,35 +222,49 @@ const LandingPage = () => {
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-      ><br /><br /><br />
-        <h1 className='ann'>Contact Us</h1>
+      >
+        <br />
+        <br />
+        <br />
+        <h1 className="ann">Contact Us</h1>
         <div className="contact-form">
           <div className="card-info">
-            <p>If you have any questions or concerns regarding your appointment scheduling, rest assured that our dedicated support team is here to 
-              assist you every step of the way. Whether you need clarification on appointment details, assistance with rescheduling, or
-               help resolving any issues that may arise, we're committed to providing you with prompt and reliable support. Your convenience
-                is our top priority, and we strive to ensure that your scheduling experience with us is smooth and hassle-free. Don't hesitate 
-                to reach out to us via email, phone, or live chat – we're always ready to help address any queries or concerns you may have.</p>
-
+          <p>If you have any questions or concerns regarding your appointment scheduling, rest assured that our dedicated support team is here to assist you every step of the way. Whether you need clarification on appointment details, assistance with rescheduling, or help resolving any issues that may arise, we're committed to providing you with prompt and reliable support. Your convenience is our top priority, and we strive to ensure that your scheduling experience with us is smooth and hassle-free. Don't hesitate to reach out to us via email, phone, or live chat – we're always ready to help address any queries or concerns you may have.</p>
           </div>
           <div className="card-message">
             <h1>Send Us Message</h1>
-            <input type="text" className='contact-input' placeholder='Full Name'/>
-
-            <input type="email" className='contact-input' placeholder='Email Address'/>
-
-            <textarea className='contact-input' name="" id="" rows="6" placeholder='Message'></textarea>
-
-            <button className='contact-btn'>Submit</button>
-
+            <input
+              type="text"
+              className="contact-input"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+            <input
+              type="email"
+              className="contact-input"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <textarea
+              className="contact-input"
+              placeholder="Message"
+              rows="6"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            ></textarea>
+            <button className="contact-btn" onClick={handleSubmit}>
+              Submit
+            </button>
           </div>
         </div>
       </motion.section>
 
       <footer className="footer">
         <motion.div className="footer-content">
+          
           <p>Bukidnon State University<a href="">Fortich St., Malaybalay City, Bukidnon</a></p>
-          <p>&copy; 2024 BukSU Guidance Center. All rights reserved.</p>
         </motion.div>
       </footer>
     </>

@@ -8,6 +8,7 @@ import Report from "../adminSide/reportGen";
 import Panel from "../adminSide/adminPanel";
 import AdminProfile from "../adminSide/adminProfile";
 import AdminEditProfile from "../adminSide/editProfile";
+import Notifications from "../adminSide/notification";
 
 const AdminRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const AdminRoutes = () => {
       <Route path="/postAnnouncements" element={<Post />} />
       <Route path="/reportGen" element={<Report />} />
       <Route path="/addStaff" element={<AddStaff />} /> 
+      <Route path="/notification" element={<Notifications />} /> 
     </Routes>
   );
 };

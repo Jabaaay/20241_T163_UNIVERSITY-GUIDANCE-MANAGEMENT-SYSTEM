@@ -1072,3 +1072,41 @@ background-color: #e8e8e8;
 {
   opacity: 0.7;
 }
+.notif
+{
+  margin: 10px;
+  color: #FFB703;
+  font-size: 25px;
+}
+.message
+{
+  display: flex;
+  margin: 10px;
+  border: 1px solid black;
+  padding: 15px; 
+  border-radius: 10px;
+  background-color: rgb(186, 220, 255);
+  border: none;
+  border: #54b4d3;
+}
+
+.message:hover
+{
+  background-color: rgb(130, 192, 253);
+  border: none;
+}
+
+.message.unread {
+  background-color: #f8f9fa; /* Light gray for unread notifications */
+  border-left: 4px solid #007bff; /* Blue left border for unread */
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.message.read {
+  background-color: #e1f7d5; /* Light green for read notifications */
+  border-left: 4px solid #28a745; /* Green left border for read */
+  padding: 10px;
+  margin-bottom: 10px;
+  text-decoration: line-through; /* Optional: strike-through to indicate read */
+}
