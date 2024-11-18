@@ -6,6 +6,7 @@ const clientId = "556695054744-arqaruhda60fv774uephm2irh0uan4du.apps.googleuserc
 
 function Logout() {
   const navigate = useNavigate();
+  
 
   const onSuccess = async () => {
     console.log("Log Out Success!");
@@ -15,7 +16,7 @@ function Logout() {
   
     // Clear all session data on the client
     sessionStorage.clear();  // Clears all session items, including 'token' and 'userInfo'
-  
+
     // Retrieve the token from session storage if needed
     const token = sessionStorage.getItem('token');
   

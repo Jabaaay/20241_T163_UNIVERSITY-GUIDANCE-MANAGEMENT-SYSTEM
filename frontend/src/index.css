@@ -253,21 +253,22 @@ font-weight: 100;
 
 .t1
 {
-  border: 1px solid black;
+  border: 1px solid rgb(201, 201, 201);
   width: 100%;
   border-collapse: collapse;
-  padding: 10px;
+
   height: 100%;
 }
 .th1, .tr1, .td1  
 {
-  width: 15%;
-  border: 1px solid black;
   padding: 10px;
   text-align: center;
-  font-size: small;
+  font-size: smaller;
   
   
+}
+.th1{
+  border-bottom: 1px solid black;
 }
 
 .act
@@ -573,7 +574,7 @@ hr
 .dash
 {
   width: 30%;
-  height: 200px;
+  height: 150px;
   border-radius: 5px;
   color: white;
   box-shadow: 0px 0 5px rgb(105, 105, 105);
@@ -597,22 +598,35 @@ hr
 
 .dat
 {
-  border: 1px solid black;
   justify-content: space-between;
   align-items: center;
   border-radius: 5px;
   box-shadow: 1px 0 5px rgba(105, 105, 105, 0.7);
+  width: 100%;
+  height: 465px;
 }
 .chart
 {
-  border: 1px solid black;
+  border: 1px solid rgb(214, 214, 214);
   margin: 10px;
+  height: 360px;
+  width: 70%;
+  border-radius: 10px;
+}
+.chartss
+{
+  border: 1px solid rgb(214, 214, 214);
+  margin: 10px;
+  height: 360px;
+  width: 30%;
+  border-radius: 10px;
 }
 .da
 {
   text-align: center;
   font-size: 50px;
   color: #000C6C;
+  margin-top: -20px;
 }
 .da2 
 {
@@ -739,11 +753,16 @@ hr
   color:#000C6C;
   font-size: 60px;
 }
-.cont 
+.cont
 {
   color: #000C6C;
   width: 70%;
   margin: 10px;
+}
+.conts
+{
+  color: #000C6C;
+  margin: 5px;
 }
 .login-button
 {
@@ -808,22 +827,22 @@ hr
 }
 .announcement-card
 {
-  border: 1px solid black;
   align-items: center;
   display: flex;
   flex-direction: column;
   width: 23%;
   border-radius: 10px;
+  background-color: whitesmoke;
+  box-shadow: 0px 0 5px rgba(0, 0, 0, 0.5); 
 
 }
 
 .images
 {
-  width: 300px;
-  height: 200px;
-  margin: 5px 0;
-  border-radius: 20px;
+  width: 345px;
+  height: 210px;
   -webkit-user-drag: none;
+  border-radius: 10px;
 }
 .images:hover
 {
@@ -954,6 +973,102 @@ justify-content: space-between;
   color: white;
 }
 .div-btns:hover
+{
+  opacity: 0.7;
+}
+
+.tr1:nth-child(even)
+{
+background-color: #e8e8e8;
+}
+.section
+{
+  background-image: url(assets/wave.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+
+}
+
+.bg 
+{
+  background-position: center;
+  background-repeat: repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh;
+  border: 1px solid black ;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(assets/buksu.jpg);
+
+
+}
+
+.dropPos
+{
+  width: 100%;
+  padding: 15px;
+  font-size: medium;
+  border: none;
+  margin-left: -15px;
+}
+
+
+.div-chart
+{
+  display: flex;
+  gap: 10px;
+}
+
+.pie
+{
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+  box-shadow: 1px 0 5px rgba(105, 105, 105, 0.7);
+  width: 35%;
+}
+
+.bod
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-form
+{
+  margin: 10px;
+  display: flex;
+  justify-content: space-evenly;
+}
+.card-info
+{
+  margin: 10px;
+  width: 30%;
+}
+.card-message
+{
+  margin: 10px;
+  width: 30%;
+  background-color: whitesmoke;
+  box-shadow: 0px 0 5px rgba(0, 0, 0, 0.5); 
+  border-radius: 5px;
+}
+.contact-input, .contact-btn
+{
+  margin: 10px;
+  padding: 10px;
+  width: 95%;
+  
+}
+.contact-btn
+{
+  background-color: #54b4d3;
+  color: white;
+  border: none;
+}
+.contact-btn:hover
 {
   opacity: 0.7;
 }

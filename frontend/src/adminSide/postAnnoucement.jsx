@@ -93,9 +93,11 @@ function Status() {
                             ></textarea>
                             <input
                                 type="file"
-                                className='inp1'
+                                className="inp1"
+                                accept="image/*"  // This ensures only image files are shown in the file picker
                                 onChange={(e) => setFile(e.target.files[0])}
-                            /><br /><br /><br /><br />
+                            />
+                            <br /><br /><br /><br />
                             <button className='con' onClick={handlePost}>Post</button>
                         </div>
                     </div>

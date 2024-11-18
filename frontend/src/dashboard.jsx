@@ -55,35 +55,44 @@ function Dashboard() {
     });
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const { name, department, value } = e.target;
         setNewStudentApp((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
+            [department]: value,
         }));
     };
 
     const handleAddStudentApp = async (e) => {
         e.preventDefault();
         try {
+            // Add userName field from userData
+            const newAppointment = {
+                ...newStudentApp,
+                userName: userData?.name, // Include user name from session data
+                department: userData?.department
+            };
+    
             const response = await fetch('http://localhost:3001/appointments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newStudentApp)
+                body: JSON.stringify(newAppointment)
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed');
             }
-
-            await fetchAppointments(); // Fetch updated appointments
+    
+            await fetchPendingAppointments(); // Fetch updated appointments
             setNewStudentApp({ appType: '', purpose: '', date: '', time: '' });
             setIsModalOpen(false); // Close the modal after adding the appointment
         } catch (error) {
             console.error('Error:', error);
         }
     };
+    
 
     const onAppointment = () => {
         Swal.fire({
@@ -96,7 +105,7 @@ function Dashboard() {
                 confirmButton: 'swal-btn'
             }
         }).then(() => {
-            navigate("/status");
+            navigate("/dashboard");
         });
     };
 

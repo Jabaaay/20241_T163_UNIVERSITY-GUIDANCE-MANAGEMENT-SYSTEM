@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import NavBar from './adminNavbar';
 import Sidebar from './adminSidebar';
+import Pagination from 'react-bootstrap/Pagination';
 
 function Status() {
     const [appointments, setAppointments] = useState([]);
@@ -52,28 +53,25 @@ function Status() {
             <div className="card1">
                 <Sidebar />
                 <div className="card3">
-                    
-
-                <div className="his">
-                <h1>Appointments</h1>
-        <select
-                        onChange={(e) => setActiveTab(e.target.value)}
-                        value={activeTab} // Set current value based on state
-                        className='opt1' 
-                    >
-                        <option value="All">All</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                    </select>
-
-        </div>
-
+                    <div className="his">
+                        <h1>Appointments</h1>
+                        <select
+                            onChange={(e) => setActiveTab(e.target.value)}
+                            value={activeTab} // Set current value based on state
+                            className='opt1' 
+                        >
+                            <option value="All">All</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                        </select>
+                    </div>
 
                     <div className="app">
                         <table className='t1'>
                             <thead>
                                 <tr className='tr1'>
-                                    <th className='th1'>ID</th>
+                                    <th className='th1'>Name</th>
+                                    <th className='th1'>College</th>
                                     <th className='th1'>Appointment Type</th>
                                     <th className='th1'>Purpose</th>
                                     <th className='th1'>Date</th>
@@ -86,7 +84,8 @@ function Status() {
                                 {filteredAppointments.length > 0 ? (
                                     filteredAppointments.map((appointment) => (
                                         <tr className='tr1' key={appointment._id}>
-                                            <td className='td1'>{appointment._id}</td>
+                                            <td className='td1'>{appointment.userName}</td> {/* Display Name */}
+                                            <td className='td1'>{appointment.department}</td>
                                             <td className='td1'>{appointment.appType}</td>
                                             <td className='td1'>{appointment.purpose}</td>
                                             <td className='td1'>{appointment.date}</td>
@@ -106,10 +105,11 @@ function Status() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className='text-center'>No Appointments</td>
+                                        <td colSpan="8" className='text-center'>No Appointments</td>
                                     </tr>
                                 )}
                             </tbody>
+
                         </table>
                     </div>
                 </div>
