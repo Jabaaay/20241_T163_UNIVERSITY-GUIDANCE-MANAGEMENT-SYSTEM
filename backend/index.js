@@ -9,10 +9,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
-
-
-
-
 // Middleware for CORS
 const corsOptions = {
     origin: ["http://localhost:5173"], 
@@ -38,10 +34,13 @@ app.use(logoutRoutes);
 // Import routes
 import studentRoute from './routes/studentApp.js';
 import adminRoute from './routes/adminRoutes.js';
+import staffRoute from './routes/staffRoutes.js'
+
 
 // Use routes
 app.use('/', studentRoute);
 app.use('/admin', adminRoute);
+app.use('/staff', staffRoute);
 
 app.use('/uploads', express.static('uploads'));
 

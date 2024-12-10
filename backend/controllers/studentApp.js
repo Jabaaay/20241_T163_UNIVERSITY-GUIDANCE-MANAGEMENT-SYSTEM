@@ -2,6 +2,7 @@ import StudentApp from "../models/studentApp.js"
 import Announcement from '../models/annoucementModels.js';
 import User from "../models/users.js";
 import Concerns from '../models/concerns.js';
+import bcrypt from 'bcryptjs';
 
 // get all appointments by the student
 const getHistory = async (req, res) => {
@@ -86,19 +87,21 @@ const getAnnouncements = async (req, res) => {
 };
 
 const handleGoogleLogin = async (req, res) => {
-    const { googleId, name, email, picture, course, department } = req.body;
+    const { googleId, name, email, picture, course, department, password } = req.body;
   
     try {
       let user = await User.findOne({ googleId });
   
       if (!user) {
         // Create a new user if they don't exist
-        user = new User({ googleId, name, email, picture, course, department });
+        user = new User({ googleId, name, email, picture, course, department, password });
         await user.save();
       } else {
         // Update the existing user
         user.course = course || user.course;
         user.department = department || user.department;
+        user.password = password || user.password;
+
         await user.save();
       }
   
@@ -108,30 +111,39 @@ const handleGoogleLogin = async (req, res) => {
     }
   };
 
-  const updateProfile = async (req, res) => {
-    const { googleId } = req.params; // Get the googleId from URL parameter
-    const { course, department } = req.body; // Extract course and department from the request body
-  
-    try {
-      // Find the user by googleId and update the profile
-      const updatedUser = await User.findOneAndUpdate(
-        { googleId },
-        { course, department },
-        { new: true } // Return the updated document
-      );
-  
-      // If user not found, send a 404 response
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      // Return the updated user data
-      res.status(200).json(updatedUser);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Error updating profile' });
+const updateProfile = async (req, res) => {
+  const { googleId } = req.params; // Get googleId from URL parameter
+  const { course, department, password } = req.body; // Extract course and department from the request body
+
+  try {
+    // Find the user by googleId
+    const user = await User.findOne({ googleId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  };
+
+    // Hash the password if it's provided
+    let updatedFields = { course, department };
+    if (password) {
+      const salt = await bcrypt.genSalt(10); // Generate salt
+      updatedFields.password = await bcrypt.hash(password, salt); // Hash the password
+    }
+
+    // Update user profile
+    const updatedUser = await User.findOneAndUpdate(
+      { googleId },
+      { $set: updatedFields }, // Use $set to update specific fields
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).json(updatedUser); // Return updated user data
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating profile' });
+  }
+};
+
+
 
   const logoutController = (req, res) => {
     req.session.destroy(err => {

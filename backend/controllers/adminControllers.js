@@ -121,8 +121,8 @@ const addStaff = async (req, res) => {
         port: 587,               // Use port 587 for STARTTLS
         secure: false,           // Secure is false because we’re using STARTTLS
         auth: {
-          user: '2201101546@student.buksu.edu.ph',  // Your email
-          pass: 'your-generated-app-password',       // App password for Gmail (if 2FA enabled)
+          user: 'sample@gmail.com',  // Your email
+          pass: '123',       // App password for Gmail (if 2FA enabled)
         },
       });
       
@@ -168,7 +168,68 @@ const getNotifications = async (req, res) => {
 };
 
 
+const deleteNotification = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Pangita ug i-delete ang notification base sa ID
+    const deletedNotification = await Concerns.findByIdAndDelete(id);
+
+    if (!deletedNotification) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    res.status(200).json({ message: 'Notification deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ message: 'Server error' });
+  };
+}
+
+  const deleteAnn = async (req, res) => {
+    try{
+        const announcement = await Announcement.findByIdAndDelete(req.params.id)
+        if(!announcement){
+            return res.status(404).json({message: "Announcement not Found"});
+        }
+
+        res.status(200).json({message: "Announcement has been Deleted!"})
+    }catch(error){
+        console.log(error)
+        res.status(500).json({message: "Failed to delete announcement"});
+    }
+
+};
+
+const updateAnnouncement = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const { header, content } = req.body;
+      const fileUrl = req.file ? req.file.path : null;
+
+      const updatedData = {
+          header,
+          content,
+      };
+      if (fileUrl) updatedData.fileUrl = fileUrl;
+
+      const updatedAnnouncement = await Announcement.findByIdAndUpdate(
+          id,
+          updatedData,
+          { new: true }
+      );
+
+      if (!updatedAnnouncement) {
+          return res.status(404).json({ message: 'Announcement not found' });
+      }
+
+      res.status(200).json(updatedAnnouncement);
+  } catch (error) {
+      res.status(500).json({ message: 'Error updating announcement', error });
+  }
+};
 
 
 
-export {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications};
+
+export {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications, deleteNotification, deleteAnn, updateAnnouncement};

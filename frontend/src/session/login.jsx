@@ -62,6 +62,7 @@ function Logins() {
           picture: decoded.picture,
           course: "",
           department: "",
+          password: "",
         }),
       });
 

@@ -39,6 +39,14 @@ function Status() {
         fetchAppointments();
     }, []);
 
+    useEffect(() => {
+        if (appointments.length > 0) {
+            $(document).ready(() => {
+                $('#myTable').DataTable();
+            });
+        }
+    }, [appointments]);
+
     // Filter appointments based on active tab
     const filteredAppointments = appointments.filter(app => {
         if (activeTab === 'All') return true;
@@ -66,8 +74,8 @@ function Status() {
                         </select>
                     </div>
 
-                    <div className="app">
-                        <table className='t1'>
+                    <div className="app" >
+                        <table className='t1' id='myTable' class='display'>
                             <thead>
                                 <tr className='tr1'>
                                     <th className='th1'>Name</th>

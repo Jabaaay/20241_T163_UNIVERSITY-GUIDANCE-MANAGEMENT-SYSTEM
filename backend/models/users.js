@@ -10,6 +10,9 @@ const userSchema = new Schema({
   course: { type: String },
   department: { type: String },
   role: { type: String, default: 'Student' },
+  password: {
+    type: String
+  }
 });
 
 const User = mongoose.model('User', userSchema);
