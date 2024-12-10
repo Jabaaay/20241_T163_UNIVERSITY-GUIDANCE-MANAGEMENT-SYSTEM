@@ -17,13 +17,23 @@ function Dashboard() {
 
     const fetchPendingAppointments = async () => {
         try {
+            // Get the logged-in user's ID from session storage
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo) throw new Error('User not logged in');
+    
+            const loggedInStudentId = userInfo.googleId;
+    
             // Fetch appointments data from the server
             const response = await fetch('http://localhost:3001/appointments');
             if (!response.ok) throw new Error('Failed to fetch appointments');
             const data = await response.json();
     
-            // Filter for pending appointments only
-            const pendingAppointments = data.filter(appointment => appointment.status === 'Waiting for Approval');
+            // Filter appointments for the logged-in user and status 'Waiting for Approval'
+            const pendingAppointments = data.filter(appointment =>
+                appointment.status === 'Waiting for Approval' &&
+                appointment.studentId === loggedInStudentId
+            );
+    
             setAppointments(pendingAppointments);
         } catch (error) {
             console.error('Error fetching pending appointments:', error);
@@ -33,6 +43,7 @@ function Dashboard() {
     useEffect(() => {
         fetchPendingAppointments();
     }, []);
+    
 
     
 
@@ -54,14 +65,64 @@ function Dashboard() {
         time: '',
     });
 
+
     const handleInputChange = (e) => {
-        const { name, department, value } = e.target;
+        const { name, value } = e.target;
+    
+        if (name === 'date') {
+            const selectedDate = new Date(value);
+            const today = new Date();
+    
+            // Prevent selecting past dates
+            if (selectedDate < today.setHours(0, 0, 0, 0)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Date',
+                    text: 'You cannot select a past date.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#FFB703',
+                });
+                return;
+            }
+    
+            // Prevent selecting weekends
+            const day = selectedDate.getDay();
+            if (day === 6 || day === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Date',
+                    text: 'Appointments cannot be scheduled on weekends.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#FFB703',
+                });
+                return;
+            }
+        }
+    
         setNewStudentApp((prev) => ({
             ...prev,
             [name]: value,
-            [department]: value,
         }));
     };
+
+    
+    // Function to check if a date is a weekend (Saturday or Sunday)
+const isWeekend = (date) => {
+    const day = new Date(date).getDay();
+    return day === 6 || day === 0; // 0 is Sunday, 6 is Saturday
+};
+
+// Minimum date logic to prevent weekend selection
+const getMinDate = () => {
+    const today = new Date();
+    // If today is Saturday, set the minimum to Monday
+    if (today.getDay() === 6) {
+        today.setDate(today.getDate() + 2); // Skip to Monday
+    } else if (today.getDay() === 0) {
+        today.setDate(today.getDate() + 1); // Skip to Monday if today is Sunday
+    }
+    return today.toISOString().split("T")[0]; // Format the date in YYYY-MM-DD
+};
 
     const handleAddStudentApp = async (e) => {
         e.preventDefault();
@@ -70,7 +131,8 @@ function Dashboard() {
             const newAppointment = {
                 ...newStudentApp,
                 userName: userData?.name, // Include user name from session data
-                department: userData?.department
+                department: userData?.department,
+                studentId: userData?.googleId
             };
     
             const response = await fetch('http://localhost:3001/appointments', {
@@ -140,24 +202,118 @@ function Dashboard() {
     };
 
     const handleEditSubmit = async () => {
-        try {
-            const response = await fetch(`http://localhost:3001/appointments/${editAppointment._id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editAppointment),
+        const selectedDate = new Date(editAppointment.date);
+        const currentDate = new Date();
+        
+        // Prevent selecting past dates
+        if (selectedDate < currentDate.setHours(0, 0, 0, 0)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Date',
+                text: 'You cannot select a past date.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
             });
-            if (!response.ok) throw new Error('Failed to update appointment');
-
-            const updatedAppointments = appointments.map(app =>
-                app._id === editAppointment._id ? editAppointment : app
-            );
-            setAppointments(updatedAppointments);
-            setIsEditing(false);
-            Swal.fire('Updated!', 'Your appointment has been updated.', 'success');
-        } catch (error) {
-            console.error("Error updating appointment:", error);
+            return;
+        }
+    
+        // Prevent selecting weekends
+        const day = selectedDate.getDay();
+        if (day === 6 || day === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Date',
+                text: 'Appointments cannot be scheduled on weekends.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
+            });
+            return;
+        }
+    
+        // If selected date is today, prevent past time slots
+        if (selectedDate.toDateString() === currentDate.toDateString()) {
+            const [startHourStr] = editAppointment.time.split(" - ")[0].split(":");
+            const startHour = parseInt(startHourStr);
+            const currentHour = currentDate.getHours();
+    
+            if (startHour <= currentHour) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Time',
+                    text: 'You cannot select a past time slot.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#FFB703',
+                });
+                return;
+            }
+        }
+    
+        const confirmation = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to update this appointment?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+        });
+    
+        if (confirmation.isConfirmed) {
+            try {
+                const response = await fetch(`http://localhost:3001/appointments/${editAppointment._id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(editAppointment),
+                });
+                if (!response.ok) throw new Error('Failed to update appointment');
+    
+                const updatedAppointments = appointments.map(app =>
+                    app._id === editAppointment._id ? editAppointment : app
+                );
+                setAppointments(updatedAppointments);
+                setIsEditing(false);
+                Swal.fire('Updated!', 'Your appointment has been updated.', 'success');
+            } catch (error) {
+                console.error("Error updating appointment:", error);
+                Swal.fire('Error!', 'Failed to update the appointment.', 'error');
+            }
+        } else {
+            Swal.fire('Cancelled', 'The update was not applied.', 'info');
         }
     };
+    
+    
+    
+
+    const availableTimeSlots = [
+        "8 - 9:00am",
+        "9 - 10:00am",
+        "10 - 11:00am",
+        "1 - 2:00pm",
+        "2 - 3:00pm",
+        "3 - 4:00pm",
+    ];
+    
+    const getFilteredTimeSlots = () => {
+        const currentDate = new Date();
+        const selectedDate = new Date(newStudentApp.date);
+    
+        // Get the current time in 24-hour format
+        const currentHour = currentDate.getHours();
+    
+        // If the selected date is today, filter times
+        if (selectedDate.toDateString() === currentDate.toDateString()) {
+            return availableTimeSlots.filter((slot) => {
+                const [startHourStr] = slot.split(" - ")[0].split(":");
+                const startHour = parseInt(startHourStr);
+    
+                // Filter out time slots that are already in the past
+                return startHour > currentHour;
+            });
+        }
+        return availableTimeSlots; // Return all time slots for future dates
+    };
+    
+    
 
 
 
@@ -198,9 +354,19 @@ function Dashboard() {
                 <td className='td1'>
     <>
     <div className="act">
-        <MdEdit className='edit' onClick={() => handleEdit(appointment)} />
-        <MdDelete className='del' onClick={() => handleDelete(appointment._id)} />
-            </div>
+        <button 
+            className='edit-btn'
+            onClick={() => handleEdit(appointment)}
+        >
+            <MdEdit /> Edit
+        </button>
+        <button 
+            className='delete-btn'
+            onClick={() => handleDelete(appointment._id)}
+        >
+            <MdDelete /> Delete
+        </button>
+    </div>
     </>
 
                                             </td>
@@ -238,24 +404,30 @@ function Dashboard() {
                                 </select>
 
 
-                                    <label>Date</label>
-                                    <input
-                                        type="date"
-                                        value={editAppointment.date}
-                                        onChange={(e) => setEditAppointment({ ...editAppointment, date: e.target.value })}
-                                    />
+                                <label>Date</label>
+                                <input
+                                    type="date"
+                                    value={editAppointment.date}
+                                    onChange={(e) => setEditAppointment({ ...editAppointment, date: e.target.value })}
+                                    min={getMinDate()} 
+                                />
+
                                     <label>Time</label>
                                 
-                                <select className='time' name="time" value={editAppointment.time}
-                                        onChange={(e) => setEditAppointment({ ...editAppointment, time: e.target.value })}>
-                                    <option value="">Select a time slot</option>
-                                    <option value="8 - 9:00am">8 - 9:00 am</option>
-                                    <option value="9 - 10:00am">9 - 10:00 am</option>
-                                    <option value="10 - 11:00am">10 - 11:00 am</option>
-                                    <option value="1 - 2:00pm">1 - 2:00 pm</option>
-                                    <option value="2 - 3:00pm">2 - 3:00 pm</option>
-                                    <option value="3 - 4:00pm">3 - 4:00 pm</option>
-                                </select>
+                                    <select
+                                        className="time"
+                                        name="time"
+                                        value={editAppointment.time}
+                                        onChange={(e) => setEditAppointment({ ...editAppointment, time: e.target.value })}
+                                    >
+                                        <option value="">Select a time slot</option>
+                                        {getFilteredTimeSlots().map((slot, index) => (
+                                            <option key={index} value={slot}>
+                                                {slot}
+                                            </option>
+                                        ))}
+                                    </select>
+
                            
                                     <button onClick={handleEditSubmit}>Save</button>
                                     <button onClick={() => setIsEditing(false)}>Cancel</button>
@@ -294,18 +466,28 @@ function Dashboard() {
                                     <div className="purpose">
                                         <h2>Select Date and Time</h2>
                                         <div className="input1">
-                                            <input className='dropdown' type="date" name='date' value={newStudentApp.date} onChange={handleInputChange} />
+                                        <input
+                                            className='dropdown'
+                                            type="date"
+                                            name='date'
+                                            value={newStudentApp.date}
+                                            onChange={handleInputChange}
+                                            min={getMinDate()} // Set the minimum date to skip weekends
+                                        />
                                         </div>
                                         <div className="input1">
-                                            <select className='dropdown' name="time" value={newStudentApp.time} onChange={handleInputChange}>
-                                                <option value="">Select a time slot</option>
-                                                <option value="8 - 9:00am">8 - 9:00 am</option>
-                                                <option value="9 - 10:00am">9 - 10:00 am</option>
-                                                <option value="10 - 11:00am">10 - 11:00 am</option>
-                                                <option value="1 - 2:00pm">1 - 2:00 pm</option>
-                                                <option value="2 - 3:00pm">2 - 3:00 pm</option>
-                                                <option value="3 - 4:00pm">3 - 4:00 pm</option>
-                                            </select>
+                                        <select
+                                            className='dropdown'
+                                            name="time"
+                                            value={newStudentApp.time}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option value="">Select a time slot</option>
+                                            {getFilteredTimeSlots().map((slot, index) => (
+                                                <option key={index} value={slot}>{slot}</option>
+                                            ))}
+                                        </select>
+
                                         </div>
                                     </div>
                                     

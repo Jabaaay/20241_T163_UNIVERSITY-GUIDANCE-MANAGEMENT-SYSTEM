@@ -14,19 +14,31 @@ function Status() {
 
     const fetchAppointments = async () => {
         try {
+            // Retrieve logged-in user's info from session storage
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo) throw new Error('User not logged in');
+    
+            const loggedInStudentId = userInfo.googleId;
+    
+            // Fetch all appointments
             const response = await fetch('http://localhost:3001/appointments');
             if (!response.ok) throw new Error('Failed to fetch appointments');
             const data = await response.json();
-            setAppointments(data);
+    
+            // Filter appointments for the logged-in user
+            const userAppointments = data.filter(appointment => appointment.studentId === loggedInStudentId);
+    
+            // Update state with the filtered appointments
+            setAppointments(userAppointments);
         } catch (error) {
             console.error('Error fetching appointments:', error);
         }
     };
-
+    
     useEffect(() => {
         fetchAppointments();
     }, []);
-
+    
     const handleDelete = async (id) => {
         Swal.fire({
             title: 'Are you sure?',

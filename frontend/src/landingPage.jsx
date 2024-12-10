@@ -16,9 +16,21 @@ const LandingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Email validation to check if it ends with @student.buksu.edu.ph
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@student\.buksu\.edu\.ph$/;
+    if (!emailRegex.test(email)) {
+      Swal.fire({
+        title: 'Invalid Email!',
+        text: 'Please use a valid @student.buksu.edu.ph email address.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      });
+      return; // Stop submission if email is invalid
+    }
+  
     const contactData = { fullName, email, message };
-
+  
     try {
       const response = await fetch('http://localhost:3001/contact', {
         method: 'POST',
@@ -27,16 +39,16 @@ const LandingPage = () => {
         },
         body: JSON.stringify(contactData),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         // Success alert
         Swal.fire({
           title: 'Success!',
           text: data.message,
           icon: 'success',
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
         });
         setFullName('');
         setEmail('');
@@ -47,7 +59,7 @@ const LandingPage = () => {
           title: 'Error!',
           text: data.error || 'Something went wrong.',
           icon: 'error',
-          confirmButtonText: 'Try Again'
+          confirmButtonText: 'Try Again',
         });
       }
     } catch (error) {
@@ -57,10 +69,11 @@ const LandingPage = () => {
         title: 'Network Error!',
         text: 'Please try again later.',
         icon: 'error',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
       });
     }
   };
+  
 
   const handleLoginClick = () => {
     navigate('/login');

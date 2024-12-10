@@ -14,19 +14,19 @@ function Status() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch('http://localhost:3001/admin/contact');
-        if (response.ok) {
-          const data = await response.json();
-          setNotifications(data);
-        } else {
-          console.error('Failed to fetch notifications');
-        }
+          const response = await fetch('http://localhost:3001/admin/contact');
+          if (response.ok) {
+              const data = await response.json();
+              setNotifications(data);
+          } else {
+              console.error('Failed to fetch notifications');
+          }
       } catch (error) {
-        console.error('Error fetching notifications:', error);
+          console.error('Error fetching notifications:', error);
       } finally {
-        setLoading(false);
+          setLoading(false);
       }
-    };
+  };
 
     fetchNotifications();
   }, []);

@@ -29,9 +29,13 @@ const {Schema} = mongoose;
         department: {
             type: String,
             required: true
+        },
+        studentId: {
+            type: String,
+            required: true
         }
     });
     
 
-const studentModel = mongoose.model('student', studentSchema);
+const studentModel = mongoose.model('appointments', studentSchema);
 export default studentModel;

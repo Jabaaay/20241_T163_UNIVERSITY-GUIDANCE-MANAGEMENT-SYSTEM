@@ -1,45 +1,75 @@
-import express from "express";
-import {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, updateProfile, getNotifications, deleteNotification, deleteAnn, updateAnnouncement} from '../controllers/adminControllers.js'
-import multer from "multer";
-
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import Staff from '../models/staffModels.js';
 
 const router = express.Router();
 
-router.get('/appointments', getHistory);
+router.post('/register', async (req, res) => {
+  try {
+    const { fullName, email, password, role } = req.body;
 
+    const existingStaff = await Staff.findOne({ email });
+    
+    if (existingStaff) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      
+      existingStaff.fullName = fullName;
+      existingStaff.password = hashedPassword;
+      existingStaff.role = role;
+      
+      await existingStaff.save();
 
-// router.put('/:id', confirmAppointment);
+      const token = jwt.sign(
+        { id: existingStaff._id, role: existingStaff.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+      );
 
-router.put('/confirm/:id', confirmAppointment);
-
-
-const upload = multer({
-    dest: 'uploads/',
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) {
-            cb(null, true);  // Accept the file
-        } else {
-            cb(new Error('Only image files are allowed!'), false);  // Reject the file
-        }
+      return res.status(200).json({
+        success: true,
+        message: 'Staff information updated successfully',
+        token,
+        staffId: existingStaff._id,
+        isUpdate: true
+      });
     }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newStaff = new Staff({
+      fullName,
+      email,
+      password: hashedPassword,
+      role
+    });
+
+    await newStaff.save();
+
+    const token = jwt.sign(
+      { id: newStaff._id, role: newStaff.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Staff registered successfully',
+      token,
+      staffId: newStaff._id,
+      isUpdate: false
+    });
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error processing staff registration/update',
+      error: error.message
+    });
+  }
 });
 
-router.post('/announcements', upload.single('file'), createAnnouncement);
-
-router.get('/announcements', getAnnouncements);
-
-router.post('/google-login', handleGoogleLogin);
-
-router.put('/update-profile/:googleId', updateProfile);
-
-router.get('/contact', getNotifications);
-
-router.delete('/contact/:id', deleteNotification);
-
-router.delete('/announcements/:id', deleteAnn);
-
-router.put('/announcements/:id', upload.single('file'), updateAnnouncement);
-
-
-
-export default router;
+export default router; 

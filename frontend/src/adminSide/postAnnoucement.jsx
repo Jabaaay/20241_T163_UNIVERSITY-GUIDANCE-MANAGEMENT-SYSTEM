@@ -180,9 +180,9 @@ function Status() {
                         </thead>
                         <tbody>
                             {announcements.length > 0 ? (
-                                announcements.map((announcement) => (
+                                announcements.map((announcement, index) => (
                                     <tr key={announcement._id} className='tr1'>
-                                        <td className='td1'>{announcement._id}</td>
+                                        <td className='td1'>{index + 1}</td>
                                         <td className='td1'>
                                             {announcement.fileUrl ? (
                                                 <img src={`http://localhost:3001/${announcement.fileUrl}`} alt="Announcement" style={{ width: '70px', height: '70px', objectFit: 'cover' }} />
