@@ -6,16 +6,21 @@ import Staff from '../models/staffModels.js';
 
 // get all appointments by the student
 const getHistory = async (req, res) => {
-    try {
-        const studentApp = await StudentApp.find();
+  try {
+      const studentApp = await StudentApp.find();
 
-        
-        res.send(studentApp);
+      // Send the response with a status code of 200 (OK)
+      res.status(200).send(studentApp);
 
-    } catch (error) {
-        console.log(error)
-    }
+  } catch (error) {
+      console.log(error);
+
+      // Send an error response with a status code of 500 (Internal Server Error)
+      res.status(500).send({ message: 'An error occurred while fetching data' });
+  }
 }
+
+
 
 
 const confirmAppointment = async (req, res) => {
@@ -37,7 +42,7 @@ const createAnnouncement = async (req, res) => {
           fileUrl = req.file.path;  // File URL after upload
       }
 
-      const announcement = new Announcement({ header, content, fileUrl });
+      const announcement = new Announcements({ header, content, fileUrl });
       await announcement.save();
       res.status(201).json({ message: 'Announcement created successfully', announcement });
   } catch (error) {

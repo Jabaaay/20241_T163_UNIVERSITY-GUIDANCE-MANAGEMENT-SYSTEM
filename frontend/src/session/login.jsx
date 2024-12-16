@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion"; // Importing motion from framer-motion
 import logo from '../assets/1.png';
 import ReCAPTCHA from "react-google-recaptcha";
+import Swal from "sweetalert2";
 
 const clientId = "403785858213-teclugcpi5rmkocudnj0dqgk0h3j8f5n.apps.googleusercontent.com";
 const RECAPTCHA_SITE_KEY = "6LdndnoqAAAAAFIKS5elH66llnZvKoOmPIY21CNv";
@@ -143,8 +144,28 @@ function Logins() {
         console.log('User stored successfully:', data);
         sessionStorage.setItem('userInfo', JSON.stringify(data.user)); // Store user info in session storage
   
-      
-        navigate('/profile');
+        // Display SweetAlert2 toast notification
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+  
+        Toast.fire({
+          icon: "success",
+          title: "Signed in successfully"
+        });
+  
+        // Redirect after a short delay
+        setTimeout(() => {
+          navigate('/profile');
+        }, 3000); // Wait for the toast to finish before redirecting
       } else {
         alert(data.message || 'Login failed');
       }
@@ -153,7 +174,6 @@ function Logins() {
       alert('Login failed. Please try again.');
     }
   };
-  
   
   
 

@@ -1,35 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
 import NavBar from './adminNavbar';
 import Sidebar from './adminSidebar';
 import { format } from 'timeago.js';
 import { MdDelete } from 'react-icons/md';
 
-function Status() {
+function Status({ updateUnreadCount }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [replyMessage, setReplyMessage] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [filteredNotifications, setFilteredNotifications] = useState([]);
+  const [showModal, setShowModal] = useState(false); // Modal visibility state
+
+  const [pendingAppointments, setPendingAppointments] = useState([]);
+  const [confirmedAppointments, setConfirmedAppointments] = useState([]);
+  const [totalAppointments, setTotalAppointments] = useState(0);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-          const response = await fetch('http://localhost:3001/admin/contact');
-          if (response.ok) {
-              const data = await response.json();
-              setNotifications(data);
-          } else {
-              console.error('Failed to fetch notifications');
-          }
+        const response = await fetch('http://localhost:3001/admin/contact');
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Sort notifications by date (most recent first)
+          const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+          
+          setNotifications(sortedData); // Set sorted notifications
+          setFilteredNotifications(sortedData); // Apply sorting to filtered notifications as well
+        } else {
+          console.error('Failed to fetch notifications');
+        }
       } catch (error) {
-          console.error('Error fetching notifications:', error);
+        console.error('Error fetching notifications:', error);
       } finally {
-          setLoading(false);
+        setLoading(false);
       }
-  };
-
+    };
+  
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true); // Start loading
+        const response = await fetch('http://localhost:3001/admin/appointments');
+        if (!response.ok) {
+          throw new Error('Failed to fetch appointments');
+        }
+        const data = await response.json();
+  
+        // Filter appointments by status
+        const pending = data.filter(appointment => appointment.status === 'Waiting for Approval');
+        const confirmed = data.filter(appointment => appointment.status === 'Confirmed');
+  
+        setPendingAppointments(pending); // No need to reverse here since we want FIFO
+        setConfirmedAppointments(confirmed); // No need to reverse here
+        setTotalAppointments(data.length);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+  
     fetchNotifications();
+    fetchAppointments(); // Fetch appointments on component mount
   }, []);
+  
+  const handleNewNotification = (newNotification) => {
+    // When a new notification arrives, add it to the top
+    setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+  
+    // Re-sort notifications in case the new one has a more recent timestamp
+    setNotifications((prevNotifications) => 
+      [...prevNotifications].sort((a, b) => new Date(b.date) - new Date(a.date))
+    );
+  };
+  
 
   const deleteNotification = async (id) => {
     try {
@@ -38,50 +83,65 @@ function Status() {
       });
       if (response.ok) {
         setNotifications((prev) => prev.filter((notif) => notif._id !== id));
-        Swal.fire('Deleted!', 'Notification has been deleted.', 'success');
+        alert('Notification has been deleted.');
       } else {
-        Swal.fire('Error!', 'Failed to delete notification.', 'error');
+        alert('Failed to delete notification.');
       }
     } catch (error) {
-      Swal.fire('Error!', 'Error deleting notification.', 'error');
+      alert('Error deleting notification.');
     }
   };
 
   const handleDelete = (id) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteNotification(id);
-      }
-    });
+    if (window.confirm('Are you sure you want to delete this notification?')) {
+      deleteNotification(id);
+    }
   };
 
-  const handleReply = async () => {
+  const handleNotificationClick = async (notification) => {
     try {
-      const response = await fetch('http://localhost:3001/admin/contact/reply', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:3001/admin/contact/${notification._id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: selectedNotification._id,
-          replyMessage,
-        }),
+        body: JSON.stringify({ status: 'read' }),
       });
       if (response.ok) {
-        Swal.fire('Success!', 'Reply sent successfully.', 'success');
-        setSelectedNotification(null);
-        setReplyMessage('');
+        const updatedNotification = await response.json();
+        setNotifications((prev) =>
+          prev.map((notif) =>
+            notif._id === updatedNotification._id ? updatedNotification : notif
+          )
+        );
+        setSelectedNotification(updatedNotification); // Set selected notification for modal
+        setShowModal(true); // Show modal
+        updateUnreadCount();
       } else {
-        Swal.fire('Error!', 'Failed to send reply.', 'error');
+        console.error('Failed to update notification status');
       }
     } catch (error) {
-      Swal.fire('Error!', 'Error sending reply.', 'error');
+      console.error('Error updating notification status:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/admin/contact/markAllAsRead', {
+        method: 'PATCH',
+      });
+      if (response.ok) {
+        setNotifications((prev) =>
+          prev.map((notif) => ({ ...notif, status: 'read' }))
+        );
+        setFilteredNotifications((prev) =>
+          prev.map((notif) => ({ ...notif, status: 'read' }))
+        );
+        alert('All notifications marked as read.');
+        updateUnreadCount();
+      } else {
+        alert('Failed to mark all notifications as read.');
+      }
+    } catch (error) {
+      alert('Error marking notifications as read.');
     }
   };
 
@@ -93,54 +153,89 @@ function Status() {
         <div className="card3">
           <div className="notif-card">
             <p>Notifications</p>
+            <select onChange={(e) => setFilter(e.target.value)} value={filter}>
+              <option value="all">All</option>
+              <option value="read">Read</option>
+              <option value="unread">Unread</option>
+            </select>
           </div>
           {loading ? (
-            <p>Loading notifications...</p>
-          ) : notifications.length > 0 ? (
-            notifications.map((notification) => (
+            <p>Loading...</p>
+          ) : filteredNotifications.length > 0 ? (
+            filteredNotifications.map((notification) => (
               <div
                 key={notification._id}
-                className="message"
-                onClick={() => setSelectedNotification(notification)}
+                className={`message ${notification.status === 'unread' ? 'unread' : 'read'}`}
+                onClick={() => handleNotificationClick(notification)}
                 style={{ cursor: 'pointer' }}
               >
-                <p className="notif-name">
-                  <b>{notification.fullName}</b>
-                </p>
-                <p className="notif-msg">{notification.message}</p>
-                <p className="notif-date">
-                  <i>{format(notification.date)}</i>
-                </p>
-                <MdDelete
-                  className="notif-del"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the click for reply
-                    handleDelete(notification._id);
-                  }}
-                  style={{ cursor: 'pointer' }}
-                />
+                <div className="name-msg">
+                  <p className="notif-name">
+                    <b>{notification.fullName}</b>
+                  </p>
+                  <p className="notif-msg">{notification.message}</p>
+                </div>
+                <div className="date-del">
+                  <p className="notif-date">{format(notification.date)}</p>
+                  <MdDelete
+                    className="notif-del"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(notification._id);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </div>
               </div>
             ))
           ) : (
             <p>No new notifications</p>
           )}
+
+{loading ? (
+            <p>Loading...</p>
+          ) : pendingAppointments.length > 0 ? (
+            pendingAppointments.map((appointment) => (
+              <div
+                key={appointment._id}
+                className={`message ${appointment.status === 'Waiting for Approval' ? 'Pending' : ''}`}
+                
+                
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="name-msg">
+                  <p className="notif-name">
+                    <b>{appointment.userName}</b>
+                  </p>
+                  <p className="notif-msg">Made an Appointment</p>
+                </div>
+                <div className="date-del">
+                  <p className="notif-date">{format(appointment.dateNow)}</p>
+                  <MdDelete
+                    className="notif-del"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(appointment._id);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No pending appointments available</p>
+          )}
+
         </div>
       </div>
 
-      {/* Reply Modal */}
-      {selectedNotification && (
+      {/* Suggestion Modal */}
+      {showModal && selectedNotification && (
         <div className="modal">
-          <div className="modal-content">
-            <h3>Reply to {selectedNotification.fullName}</h3>
-            <textarea
-              rows="4"
-              placeholder="Type your reply here..."
-              value={replyMessage}
-              className='txtArea'
-              onChange={(e) => setReplyMessage(e.target.value)}
-            ></textarea>
-            <button onClick={handleReply}>Send Reply</button>
-            <button onClick={() => setSelectedNotification(null)}>Cancel</button>
+          <div className="modal-contents">
+            <h3 className='namess'>{selectedNotification.fullName}</h3>
+            <p className='msgss'>{selectedNotification.message}</p>
+            <button className='btnss' onClick={() => setShowModal(false)}>Close</button>
           </div>
         </div>
       )}

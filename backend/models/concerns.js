@@ -19,6 +19,11 @@ const ContactMessageSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  status: {
+    type: String,
+    enum: ['unread', 'read'],
+    default: 'unread', // Default is 'unread'
+  },
 });
 
 const concerns = mongoose.model('concerns', ContactMessageSchema);

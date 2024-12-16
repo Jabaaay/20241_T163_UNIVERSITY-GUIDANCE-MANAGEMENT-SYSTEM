@@ -571,15 +571,6 @@ hr
   align-items: center;
 }
 
-.dash
-{
-  width: 30%;
-  height: 150px;
-  border-radius: 5px;
-  color: white;
-  box-shadow: 0px 0 5px rgb(105, 105, 105);
-
-}
 .head
 {
   display: flex;
@@ -621,16 +612,17 @@ hr
   width: 30%;
   border-radius: 10px;
 }
-.da
+.das
 {
   text-align: center;
-  font-size: 50px;
   color: #000C6C;
-  margin-top: -20px;
+  font-size: 50px;
 }
-.da2 
+.da2s
 {
   color: #8884d8;
+  font-weight: 100;
+  font-size: larger;
 }
 .con
 {
@@ -1078,37 +1070,63 @@ background-color: #e8e8e8;
   color: #FFB703;
   font-size: 25px;
 }
-.message
-{
+.message {
   display: flex;
+  border: 1px solid rgb(215, 213, 213);
+  justify-content: space-between;
+  padding: 15px;
+  border-radius: 3px;
+  align-items: center;
+  height: 70px; /* Fixed height */
+  overflow: hidden; /* Hide overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis for long text */
+  white-space: nowrap; /* Prevent text wrapping */
   margin: 10px;
-  border: 1px solid black;
-  padding: 15px; 
-  border-radius: 10px;
-  background-color: rgb(186, 220, 255);
-  border: none;
-  border: #54b4d3;
 }
-
 .message:hover
 {
-  background-color: rgb(130, 192, 253);
-  border: none;
+  opacity: 0.7;
+  background-color: #e8e8e8;
+
 }
 
+.name-msg {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1; /* Let it expand to take available space */
+  font-size: smaller;
+}
+
+.notif-name,
+.notif-msg {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+
+
 .message.unread {
-  background-color: #f8f9fa; /* Light gray for unread notifications */
-  border-left: 4px solid #007bff; /* Blue left border for unread */
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 20px;
+  background-color: #007bff;
 }
 
 .message.read {
-  background-color: #e1f7d5; /* Light green for read notifications */
-  border-left: 4px solid #28a745; /* Green left border for read */
-  padding: 10px;
+  padding: 20px;
   margin-bottom: 10px;
-  text-decoration: line-through; /* Optional: strike-through to indicate read */
+  border: 1px solid rgb(215, 213, 213);
+}
+
+.message.read:hover
+{
+  opacity: 0.7;
+}
+.message.unread:hover
+{
+  opacity: 0.7;
 }
 
 /* FullCalendar styles */
@@ -1436,8 +1454,8 @@ gap: 10px;
 }
 .notif-date
 {
-  width: 15%;
   text-align: right;
+  font-size: 10px;
 }
 .notif-del
 {
@@ -1525,6 +1543,81 @@ gap: 10px;
   gap: 10px;
   font-size: 25px;
 }
+
+.notification-container {
+  position: relative;
+  display: inline-block;
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+.date-del
+{
+  width: 12%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.name-msg
+{
+  width: 88%;
+}
+.modal-contents
+{
+  background-color: #f1f1f1;
+  width: 50%;
+  height: 60%;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.namess
+{
+  margin: 10px;
+}
+.msgss
+{
+  margin: 10px;
+  border: 1px solid rgb(179, 179, 179);
+  font-size: small;
+  height: 70%;
+  padding: 5px;
+  margin-top: -5px;
+}
+.btnss
+{
+  margin: 10px;
+  padding: 10px;
+  background-color: #54b4d3;
+  color: white;
+  border: none;
+}
+.dashss
+{
+  width: 30%;
+  border-radius: 10px;
+  box-shadow: 0px 0 5px rgb(105, 105, 105);
+  padding-left: 20px;
+  border-left: 5px solid #54b4d3;
+
+}
+
+
+
+
+
+
 
 
 

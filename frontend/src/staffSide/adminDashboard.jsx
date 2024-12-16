@@ -15,7 +15,7 @@ const Dashboard = () => {
     const fetchAppointments = async () => {
         try {
             setLoading(true); // Start loading
-            const response = await fetch('http://localhost:3001/staff/appointments');
+            const response = await fetch('http://localhost:3001/admin/appointments');
             if (!response.ok) {
                 throw new Error('Failed to fetch appointments');
             }
@@ -89,17 +89,17 @@ const data02 = Object.keys(aggregatedData)
                     ) : (
                         <>
                             <div className="dis">
-                                <div className="dash"> 
-                                    <h2 className='da2'>Confirmed</h2>
-                                    <h1 className='da'>{confirmedAppointments.length}</h1>
+                                <div className="dashss"> 
+                                    <h2 className='da2s'>Confirmed</h2>
+                                    <h1 className='das'>{confirmedAppointments.length}</h1>
                                 </div>
-                                <div className="dash"> 
-                                    <h2 className='da2'>Pending</h2>
-                                    <h1 className='da'>{pendingAppointments.length}</h1>
+                                <div className="dashss"> 
+                                    <h2 className='da2s'>Pending</h2>
+                                    <h1 className='das'>{pendingAppointments.length}</h1>
                                 </div>
-                                <div className="dash"> 
-                                    <h2 className='da2'>Total Appointments</h2>
-                                    <h1 className='da'>{totalAppointments}</h1>
+                                <div className="dashss"> 
+                                    <h2 className='da2s'>Total Appointments</h2>
+                                    <h1 className='das'>{totalAppointments}</h1>
                                 </div>
                             </div>
                             <br />

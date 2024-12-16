@@ -1,14 +1,15 @@
 import express from "express";
-import {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin, logoutController, updateProfile, getUser} from '../controllers/studentApp.js'
+import {getHistory, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin, logoutController, updateProfile, Users} from '../controllers/studentApp.js'
 import StudentApp from '../models/studentApp.js';
 import nodemailer from 'nodemailer';
+import Concerns from '../models/concerns.js';
+
 
 const router = express.Router();
 
 router.get('/appointments', getHistory);
 
-router.get('/user', getUser);
-
+router.get('/user', Users);
 
 router.post('/appointments', addApp);
 
@@ -64,12 +65,64 @@ router.post('/contact', async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.json({ message: 'Your message has been received. A confirmation email has been sent to your inbox.' });
+    const newMessage = new Concerns({
+      fullName,
+      email,
+      message,
+    });
+
+    await newMessage.save();
+
+    res.json({ message: 'Thank you for your concern' });
   } catch (error) {
     console.error('Error sending acknowledgment email:', error);
     res.status(500).json({ message: 'Failed to send acknowledgment email', error: error.message });
   }
 });
+
+// Route to fetch a specific calendar event by ID
+router.get('/calendar/:studentId', async (req, res) => {
+  try {
+      const studentId = req.params.studentId;
+      if (!studentId) {
+          return res.status(400).json({ error: 'Student ID is required' });
+      }
+
+      // Fetch the specific appointment using the studentId
+      const appointment = await StudentApp.findOne({ studentId });
+      if (!appointment) {
+          return res.status(404).json({ error: 'Appointment not found' });
+      }
+
+      // Map the appointment to calendar event format
+      const [year, month, day] = appointment.date.split('-').map(num => parseInt(num, 10));
+      const [hours, minutes] = appointment.time.split(':').map(num => parseInt(num, 10));
+
+      const startDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+      const endDateStr = new Date(new Date(startDateStr).getTime() + 60 * 60 * 1000).toISOString();
+
+      const event = {
+          title: `${appointment.appType} - ${appointment.purpose}`,
+          start: startDateStr,
+          end: endDateStr,
+          status: appointment.status,
+          backgroundColor: appointment.status === 'Confirmed' ? '#14a44d' : '#FFB703',
+          source: 'database',
+          extendedProps: {
+              userName: appointment.userName,
+              department: appointment.department,
+              status: appointment.status
+          }
+      };
+
+      // Respond with the event
+      res.status(200).json(event);
+  } catch (error) {
+      console.error('Error fetching calendar event:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 export default router;
 

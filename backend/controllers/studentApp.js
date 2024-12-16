@@ -4,29 +4,38 @@ import User from "../models/users.js";
 import Concerns from '../models/concerns.js';
 
 // get all appointments by the student
+
+
 const getHistory = async (req, res) => {
-    try {
-        const studentApp = await StudentApp.find();
+  try {
+      const studentApp = await StudentApp.find();
 
-        
-        res.send(studentApp);
+      // Send the response with a status code of 200 (OK)
+      res.status(200).send(studentApp);
 
-    } catch (error) {
-        console.log(error)
-    }
+  } catch (error) {
+      console.log(error);
+
+      // Send an error response with a status code of 500 (Internal Server Error)
+      res.status(500).send({ message: 'An error occurred while fetching data' });
+  }
 }
 
-const getUser = async (req, res) => {
+const Users = async (req, res) => {
   try {
       const studentApp = await User.find();
 
-      
-      res.send(studentApp);
+      // Send the response with a status code of 200 (OK)
+      res.status(200).send(studentApp);
 
   } catch (error) {
-      console.log(error)
+      console.log(error);
+
+      // Send an error response with a status code of 500 (Internal Server Error)
+      res.status(500).send({ message: 'An error occurred while fetching data' });
   }
 }
+
 
 // student can add appointment
 const addApp = async (req, res) => {
@@ -73,6 +82,8 @@ const cancelApp = async (req, res) => {
     }
 
 }
+
+
 
 
 //student can update appointment
@@ -148,7 +159,12 @@ const handleGoogleLogin = async (req, res) => {
       }
   
       // Return the updated user data
-      res.status(200).json(updatedUser);
+      res.status(200).json({
+        success: true,
+        message: "User updated successfully",
+        data: updatedUser,
+    });
+    
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Error updating profile' });
@@ -192,4 +208,4 @@ const submitContactForm = async (req, res) => {
 
 
 
-export {getHistory, getUser, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin, logoutController, updateProfile, submitContactForm};
+export {getHistory, Users, addApp, cancelApp, updateApp, getAnnouncements, handleGoogleLogin, logoutController, updateProfile, submitContactForm};

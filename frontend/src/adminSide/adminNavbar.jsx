@@ -6,38 +6,45 @@ import { MdNotifications } from "react-icons/md";
 function NavBar() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [notifications, setNotifications] = useState([]); // State to store notifications
-  const [loading, setLoading] = useState(true); // Loading state
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Retrieve user data from sessionStorage
     const storedUser = sessionStorage.getItem('userInfo');
     if (storedUser) {
-      setUserData(JSON.parse(storedUser)); // Set user data in state
+      setUserData(JSON.parse(storedUser));
     }
 
-    // Fetch notifications from the server
     const fetchNotifications = async () => {
       try {
-        const response = await fetch('http://localhost:3001/admin/contact'); // Adjust the URL as needed
+        const response = await fetch('http://localhost:3001/admin/contact');
         if (response.ok) {
           const data = await response.json();
-          setNotifications(data); // Store fetched notifications
+          setNotifications(data);
+          const unread = data.filter(notification => notification.status === 'unread').length;
+          setUnreadCount(unread);
         } else {
           console.error('Failed to fetch notifications');
         }
       } catch (error) {
         console.error('Error fetching notifications:', error);
       } finally {
-        setLoading(false); // Stop loading after fetch attempt
+        setLoading(false);
       }
     };
-
+    
     fetchNotifications();
   }, []);
 
   const handleNavigation = (route) => {
-    navigate(route);  // Navigate to the specified route
+    navigate(route);
+  };
+
+  // Function to update unread count when a notification is marked as read
+  const updateUnreadCount = () => {
+    const unread = notifications.filter(notification => notification.status === 'unread').length;
+    setUnreadCount(unread);
   };
 
   return (
@@ -47,21 +54,21 @@ function NavBar() {
       </div>
 
       <div className="user-info">
-        <MdNotifications 
-          className="notif" 
-          onClick={() => handleNavigation('/notification')}  // Navigate to notifications page
-        />
-        
+        <div className="notification-container" onClick={() => handleNavigation('/notification')}>
+          <MdNotifications className="notif" />
+          {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
+        </div>
+
         {userData ? (
-          <button className='user' onClick={() => handleNavigation('/adminProfile')}>
+          <button className="user" onClick={() => handleNavigation('/adminProfile')}>
             {userData.picture ? (
               <img src={userData.picture} alt="User" />
             ) : (
-              <span>{userData.name?.charAt(0)}</span> // Show initial if no picture
+              <span>{userData.name?.charAt(0)}</span>
             )}
           </button>
         ) : (
-          <button className='user' onClick={() => handleNavigation('/login')}>Login</button>
+          <button className="user" onClick={() => handleNavigation('/login')}>Login</button>
         )}
       </div>
     </nav>

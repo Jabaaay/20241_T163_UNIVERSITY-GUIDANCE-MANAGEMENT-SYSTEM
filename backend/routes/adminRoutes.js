@@ -8,6 +8,7 @@ import { dirname, join } from 'path';
 import StudentApp from '../models/studentApp.js';
 import { transporter } from '../config/nodemailer.js';
 import Staff from "../models/staffModels.js";
+import concerns from "../models/concerns.js";
 
 const router = express.Router();
 
@@ -131,6 +132,39 @@ router.put('/update-profile/:googleId', updateProfile);
 router.post('/add', addStaff);
 
 router.get('/contact', getNotifications);
+
+router.patch('/contact/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedConcern = await concerns.findByIdAndUpdate(
+      id,
+      { status: 'read' },
+      { new: true }
+    );
+    if (!updatedConcern) {
+      return res.status(404).json({ message: 'Notification not found.' });
+    }
+    res.status(200).json(updatedConcern);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating notification.', error });
+  }
+});
+
+router.patch('/contact/markAllAsRead', async (req, res) => {
+  try {
+    const updatedConcerns = await concerns.updateMany(
+      { status: 'unread' },  // Update only unread notifications
+      { $set: { status: 'read' } }  // Mark them as read
+    );
+    if (updatedConcerns.modifiedCount === 0) {
+      return res.status(404).json({ message: 'No unread notifications found.' });
+    }
+    res.status(200).json({ message: 'All notifications marked as read.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error marking all notifications as read.', error });
+  }
+});
+
 
 router.delete('/contact/:id', deleteNotification);
 
