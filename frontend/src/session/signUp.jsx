@@ -52,21 +52,31 @@ function Logins() {
   const validatePasswords = () => {
     let isValid = true;
     const newErrors = {};
-
+  
     // Password strength validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+  
     if (!passwordRegex.test(formData.password)) {
-      newErrors.password = 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character';
       isValid = false;
+  
+      Swal.fire({
+        icon: 'warning',
+        title: 'Weak Password!',
+        text: 'Password must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character'
+      });
     }
-
+  
     // Password match validation
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
       isValid = false;
+  
+      Swal.fire({
+        icon: 'warning',
+        title: 'Password Mismatch!',
+        text: 'Password do not match!'
+      });
     }
-
+  
     setErrors(newErrors);
     return isValid;
   };
