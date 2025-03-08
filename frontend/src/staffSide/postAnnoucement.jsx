@@ -104,58 +104,48 @@ function Status() {
     };
 
     const handleEdit = (announcement) => {
-        setEditingAnnouncement(announcement); // Set the announcement to be edited
-        setHeader(announcement.header);
-        setContent(announcement.content);
-        setIsEditModalOpen(true); // Open the edit modal
-    };
-
-    const handleUpdate = async () => {
-        const formData = new FormData();
-        formData.append('header', header);
-        formData.append('content', content);
-        if (file) formData.append('file', file);
-
-        try {
-            const response = await fetch(`http://localhost:3001/staff/announcements/${editingAnnouncement._id}`, {
-                method: 'PUT',
-                body: formData,
-            });
-
-            if (response.ok) {
-                const updatedAnnouncement = await response.json();
-                setAnnouncements((prevAnnouncements) =>
-                    prevAnnouncements.map((announcement) =>
-                        announcement._id === updatedAnnouncement._id ? updatedAnnouncement : announcement
-                    )
-                );
-                setEditingAnnouncement(null);
-                setHeader('');
-                setContent('');
-                setFile(null);
-                setIsEditModalOpen(false); // Close the edit modal after updating
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Announcement updated successfully!',
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Error updating announcement.',
-                });
-            }
-        } catch (error) {
-            console.error('Error updating announcement:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while updating the announcement.',
-            });
-        }
-    };
+           console.log('Editing announcement:', announcement);
+           setEditingAnnouncement(announcement);
+           setHeader(announcement.header);
+           setContent(announcement.content);
+           setFile(null);
+           setVersion(announcement.__v);
+           setIsEditModalOpen(true);
+       };
+       
+       
+       const handleUpdate = async () => {
+           const formData = new FormData();
+           formData.append('header', header);
+           formData.append('content', content);
+           if (file) formData.append('file', file);
+           formData.append('__v', version); // Include version in the request
+       
+           try {
+               const response = await fetch(`http://localhost:3001/staff/announcements/${editingAnnouncement._id}`, {
+                   method: 'PUT',
+                   body: formData,
+               });
+       
+               if (response.ok) {
+                   const updatedAnnouncement = await response.json();
+                   setAnnouncements((prevAnnouncements) =>
+                       prevAnnouncements.map((announcement) =>
+                           announcement._id === updatedAnnouncement._id ? updatedAnnouncement : announcement
+                       )
+                   );
+                   setIsEditModalOpen(false);
+                   Swal.fire('Success', 'Announcement updated successfully!', 'success');
+               } else if (response.status === 409) {
+                   Swal.fire('Warning', 'Version conflict. Please reload and try again.', 'error');
+               } else {
+                   Swal.fire('Error', 'Error updating announcement.', 'error');
+               }
+           } catch (error) {
+               console.error('Error:', error);
+               Swal.fire('Error', 'An error occurred while updating the announcement.', 'error');
+           }
+       };
 
     return (
         <>

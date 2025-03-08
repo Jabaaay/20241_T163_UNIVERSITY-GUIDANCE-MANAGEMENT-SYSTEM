@@ -103,7 +103,13 @@ function History() {
                                             <td className='td1'>{appointment.purpose}</td>
                                             <td className='td1'>{appointment.date}</td>
                                             <td className='td1'>{appointment.time}</td>
-                                            <td className='td1'>{appointment.status}</td>
+                                            <td className='td1'>
+                    <p 
+                        className={`p-status ${appointment.status === 'Waiting for Approval' ? 'red-status' : 'green-status'}`}
+                    >
+                        {appointment.status}
+                    </p>
+                </td>
                                         </tr>
                                     ))
                                 ) : (

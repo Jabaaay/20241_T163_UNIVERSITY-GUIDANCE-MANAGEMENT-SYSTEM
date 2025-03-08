@@ -124,36 +124,53 @@ const getMinDate = () => {
     return today.toISOString().split("T")[0]; // Format the date in YYYY-MM-DD
 };
 
-    const handleAddStudentApp = async (e) => {
-        e.preventDefault();
-        try {
-            // Add userName field from userData
-            const newAppointment = {
-                ...newStudentApp,
-                userName: userData?.name, // Include user name from session data
-                department: userData?.department,
-                studentId: userData?.googleId
-            };
-    
-            const response = await fetch('http://localhost:3001/appointments', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newAppointment)
-            });
-    
-            if (!response.ok) {
+const handleAddStudentApp = async (e) => {
+    e.preventDefault();
+    try {
+        // Add userName field from userData
+        const newAppointment = {
+            ...newStudentApp,
+            userName: userData?.name, // Include user name from session data
+            department: userData?.department,
+            studentId: userData?.googleId
+        };
+
+        const response = await fetch('http://localhost:3001/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newAppointment)
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            if (data.message === "This time slot is already booked.") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Appointment Failed',
+                    text: 'This time slot is already booked. Please choose another time.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#FFB703',
+                    customClass: {
+                        confirmButton: 'swal-btn'
+                    }
+                });
+                return;
+            } else {
                 throw new Error('Failed');
             }
-    
-            await fetchPendingAppointments(); // Fetch updated appointments
-            setNewStudentApp({ appType: '', purpose: '', date: '', time: '' });
-            setIsModalOpen(false); // Close the modal after adding the appointment
-        } catch (error) {
-            console.error('Error:', error);
         }
-    };
+
+        await fetchPendingAppointments(); // Fetch updated appointments
+        setNewStudentApp({ appType: '', purpose: '', date: '', time: '' });
+        setIsModalOpen(false); // Close the modal after adding the appointment
+        onAppointment(); // Show success message
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
     
 
     const onAppointment = () => {
@@ -350,7 +367,7 @@ const getMinDate = () => {
                 <td className='td1'>{appointment.purpose}</td>
                 <td className='td1'>{appointment.date}</td>
                 <td className='td1'>{appointment.time}</td>
-                <td className='td1'>{appointment.status}</td>
+                <td className='td1'><p className='p-status'>{appointment.status}</p></td>
                 <td className='td1'>
     <>
     <div className="act">

@@ -36,8 +36,6 @@ const Users = async (req, res) => {
   }
 }
 
-
-// student can add appointment
 const addApp = async (req, res) => {
   try {
       const { date, time } = req.body;
@@ -49,6 +47,16 @@ const addApp = async (req, res) => {
       // Check if the appointment date and time are in the past
       if (appointmentDateTime < currentDateTime) {
           return res.status(400).json({ message: "Cannot book an appointment in the past." });
+      }
+
+      // Check if an appointment already exists for the same date and time
+      const existingAppointment = await StudentApp.findOne({
+          date: req.body.date,
+          time: req.body.time
+      });
+
+      if (existingAppointment) {
+          return res.status(400).json({ message: "This time slot is already booked." });
       }
 
       const userName = req.body.userName;

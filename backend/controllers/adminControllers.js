@@ -42,7 +42,7 @@ const createAnnouncement = async (req, res) => {
           fileUrl = req.file.path;  // File URL after upload
       }
 
-      const announcement = new Announcements({ header, content, fileUrl });
+      const announcement = new Announcement({ header, content, fileUrl });
       await announcement.save();
       res.status(201).json({ message: 'Announcement created successfully', announcement });
   } catch (error) {
@@ -174,23 +174,21 @@ const deleteNotification = async (req, res) => {
 const updateAnnouncement = async (req, res) => {
   try {
       const { id } = req.params;
-      const { header, content } = req.body;
+      const { header, content, __v } = req.body; // Include the version from the client
       const fileUrl = req.file ? req.file.path : null;
 
-      const updatedData = {
-          header,
-          content,
-      };
+      const updatedData = { header, content };
       if (fileUrl) updatedData.fileUrl = fileUrl;
 
-      const updatedAnnouncement = await Announcement.findByIdAndUpdate(
-          id,
-          updatedData,
+      // Attempt to update with optimistic concurrency
+      const updatedAnnouncement = await Announcement.findOneAndUpdate(
+          { _id: id, __v }, // Match the ID and version
+          { ...updatedData, $inc: { __v: 1 } }, // Increment version
           { new: true }
       );
 
       if (!updatedAnnouncement) {
-          return res.status(404).json({ message: 'Announcement not found' });
+          return res.status(409).json({ message: 'Version conflict or announcement not found' });
       }
 
       res.status(200).json(updatedAnnouncement);
@@ -198,6 +196,7 @@ const updateAnnouncement = async (req, res) => {
       res.status(500).json({ message: 'Error updating announcement', error });
   }
 };
+
 
 const getStaff = async (req, res) => {
   try {

@@ -1613,6 +1613,21 @@ gap: 10px;
 
 }
 
+.p-status
+{
+  background-color: #54b4d3;
+  border-radius: 5px;
+  color: white;
+}
+
+.green-status {
+  background-color: #20c997;
+  border-radius: 5px;
+  color: white;
+}
+
+
+
 
 
 

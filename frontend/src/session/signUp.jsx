@@ -188,7 +188,7 @@ function Logins() {
                   className='in'
                   type="email"
                   name="email"
-                  placeholder="Enter Personal Email"
+                  placeholder="Enter Institutional Email"
                   value={formData.email}
                   onChange={handleInputChange}
                   required
