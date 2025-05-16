@@ -69,22 +69,107 @@ function Status() {
     };
 
     const handleEditSubmit = async () => {
-        try {
-            const response = await fetch(`http://localhost:3001/appointments/${editAppointment._id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editAppointment),
+        const selectedDate = new Date(editAppointment.date);
+        const currentDate = new Date();
+        
+        // Prevent selecting past dates
+        if (selectedDate < currentDate.setHours(0, 0, 0, 0)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Date',
+                text: 'You cannot select a past date.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
             });
-            if (!response.ok) throw new Error('Failed to update appointment');
+            return;
+        }
 
-            const updatedAppointments = appointments.map(app =>
-                app._id === editAppointment._id ? editAppointment : app
-            );
-            setAppointments(updatedAppointments);
-            setIsEditing(false);
-            Swal.fire('Updated!', 'Your appointment has been updated.', 'success');
-        } catch (error) {
-            console.error("Error updating appointment:", error);
+        // Prevent selecting weekends
+        const day = selectedDate.getDay();
+        if (day === 6 || day === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Date',
+                text: 'Appointments cannot be scheduled on weekends.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
+            });
+            return;
+        }
+
+        // If selected date is today, prevent past time slots
+        if (selectedDate.toDateString() === currentDate.toDateString()) {
+            const [startHourStr] = editAppointment.time.split(" - ")[0].split(":");
+            const startHour = parseInt(startHourStr);
+            const currentHour = currentDate.getHours();
+
+            if (startHour <= currentHour) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Time',
+                    text: 'You cannot select a past time slot.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#FFB703',
+                });
+                return;
+            }
+        }
+
+        const confirmation = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to update this appointment?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+            confirmButtonColor: '#FFB703',
+        });
+
+        if (confirmation.isConfirmed) {
+            try {
+                const response = await fetch(`http://localhost:3001/appointments/${editAppointment._id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(editAppointment),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to update appointment');
+                }
+
+                if (data.success) {
+                    const updatedAppointments = appointments.map(app =>
+                        app._id === editAppointment._id ? data.appointment : app
+                    );
+                    setAppointments(updatedAppointments);
+                    setIsEditing(false);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Your appointment has been updated.',
+                        confirmButtonColor: '#FFB703',
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to update appointment');
+                }
+            } catch (error) {
+                console.error("Error updating appointment:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: error.message || 'Failed to update the appointment. Please try again.',
+                    confirmButtonColor: '#FFB703',
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'Cancelled',
+                text: 'The update was not applied.',
+                confirmButtonColor: '#FFB703',
+            });
         }
     };
 

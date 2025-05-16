@@ -1,5 +1,5 @@
 import express from "express";
-import {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications, deleteNotification, deleteAnn, updateAnnouncement, getStaff} from '../controllers/adminControllers.js'
+import {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications, deleteNotification, deleteAnn, updateAnnouncement, getStaff, deleteStaff } from '../controllers/adminControllers.js'
 import multer from "multer";
 import { google } from 'googleapis';
 import { readFile } from 'fs/promises';
@@ -256,5 +256,7 @@ router.get('/test-email', async (req, res) => {
 });
 
 router.get('/staff', getStaff);
+
+router.delete('/staff/:id', deleteStaff);
 
 export default router;

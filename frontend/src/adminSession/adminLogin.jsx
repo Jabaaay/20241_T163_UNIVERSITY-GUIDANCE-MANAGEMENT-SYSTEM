@@ -52,6 +52,31 @@ function Logins() {
     try {
       sessionStorage.clear();
       const decoded = jwtDecode(response.credential);
+      
+      // Show loading state
+      Swal.fire({
+        title: 'Logging in...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      }); 
+
+      // Check if the email is from the allowed domain
+      const email = decoded.email;
+      const allowedDomain = 'student.buksu.edu.ph';
+      const emailDomain = email.split('@')[1];
+
+      if (emailDomain !== allowedDomain) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Please use your BukSU student email (@student.buksu.edu.ph)',
+          confirmButtonColor: '#FFB703',
+        });
+        return;
+      }
+
       const res = await fetch('http://localhost:3001/admin/google-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,29 +85,56 @@ function Logins() {
           name: decoded.name,
           email: decoded.email,
           picture: decoded.picture,
-          position: "",
+          position: "Admin",
         }),
       });
 
       const data = await res.json();
-      if (res.ok) {
+      
+      if (res.ok && data.success) {
+        // Store token and user info
         setToken(data.token);
         localStorage.setItem('token', data.token);
         setUserInfo(data.admin);
         sessionStorage.setItem('userInfo', JSON.stringify(data.admin));
 
-        alert('Proceed to Profile for verification');
-        navigate('/adminProfile');
+        // Show success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'Proceed to Profile for verification',
+          confirmButtonColor: '#FFB703',
+        }).then(() => {
+          navigate('/adminProfile');
+        });
       } else {
-        console.error('Error storing user:', data.error);
+        // Show error message
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: data.message || 'Failed to login with Google',
+          confirmButtonColor: '#FFB703',
+        });
       }
     } catch (error) {
       console.error("Failed to decode token or store user:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'An error occurred during login',
+        confirmButtonColor: '#FFB703',
+      });
     }
   };
 
   const handleFailure = (error) => {
-    console.log("Login failed", error);
+    console.error("Login failed", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: 'Failed to login with Google',
+      confirmButtonColor: '#FFB703',
+    });
   };
 
   const loginAdmin = () => {
@@ -176,7 +228,7 @@ function Logins() {
           whileHover={{ scale: 1.1 }}
         />
       </div>
-      
+      <a href="/" className="home-link" style={{color: 'white', textDecoration: 'none', fontSize: '1.2rem', fontWeight: 'bold'}}>Back</a>
     </motion.nav>
     <div className="bg">
       <motion.div
@@ -236,11 +288,13 @@ function Logins() {
             >
               <GoogleLogin 
                 clientId={clientId}
-                buttonText="Login with Google"
                 onSuccess={handleSuccess}
-                onFailure={handleFailure}
-                cookiePolicy={'single-host-origin'}
-                isSignedIn={true}
+                onError={handleFailure}
+                useOneTap
+                theme="filled_blue"
+                shape="rectangular"
+                text="signin_with"
+                size="large"
               />
             </motion.div>
 

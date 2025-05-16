@@ -173,6 +173,8 @@ function Logins() {
             whileHover={{ scale: 1.1 }}
           />
         </div>
+        <a href="/" className="home-link" style={{color: 'white', textDecoration: 'none', fontSize: '1.2rem', fontWeight: 'bold'}}>Back</a>
+
       </motion.nav>
       <div className="bg">
         <motion.div

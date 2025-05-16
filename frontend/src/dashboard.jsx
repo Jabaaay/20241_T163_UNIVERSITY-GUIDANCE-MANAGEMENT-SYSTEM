@@ -99,6 +99,29 @@ function Dashboard() {
             }
         }
     
+        if (name === 'time') {
+            const currentDate = new Date();
+            const selectedDate = new Date(newStudentApp.date);
+            
+            // If selected date is today, validate time
+            if (selectedDate.toDateString() === currentDate.toDateString()) {
+                const [startHourStr] = value.split(" - ")[0].split(":");
+                const startHour = parseInt(startHourStr);
+                const currentHour = currentDate.getHours();
+                
+                if (startHour <= currentHour) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid Time',
+                        text: 'You cannot select a time slot that has already passed.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#FFB703',
+                    });
+                    return;
+                }
+            }
+        }
+    
         setNewStudentApp((prev) => ({
             ...prev,
             [name]: value,
@@ -130,10 +153,27 @@ const handleAddStudentApp = async (e) => {
         // Add userName field from userData
         const newAppointment = {
             ...newStudentApp,
-            userName: userData?.name, // Include user name from session data
+            userName: userData?.name,
             department: userData?.department,
             studentId: userData?.googleId
         };
+
+        // Validate time slot
+        const [startTime] = newAppointment.time.split(" - ");
+        const appointmentDateTime = new Date(`${newAppointment.date}T${startTime}:00`);
+        const currentDateTime = new Date();
+
+        if (appointmentDateTime < currentDateTime || newAppointment.appType == '' || newAppointment.purpose == '' || 
+            newAppointment.date == '' || newAppointment.time == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please fill up all the fields.',
+                text: 'Fill up all the fields to create an appointment.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
+            });
+            return;
+        }
 
         const response = await fetch('http://localhost:3001/appointments', {
             method: 'POST',
@@ -143,50 +183,55 @@ const handleAddStudentApp = async (e) => {
             body: JSON.stringify(newAppointment)
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const data = await response.json();
-            if (data.message === "This time slot is already booked.") {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Appointment Failed',
-                    text: 'This time slot is already booked. Please choose another time.',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#FFB703',
-                    customClass: {
-                        confirmButton: 'swal-btn'
-                    }
-                });
-                return;
-            } else {
-                throw new Error('Failed');
-            }
+            throw new Error(data.message || 'Failed to create appointment');
         }
 
-        await fetchPendingAppointments(); // Fetch updated appointments
-        setNewStudentApp({ appType: '', purpose: '', date: '', time: '' });
-        setIsModalOpen(false); // Close the modal after adding the appointment
-        onAppointment(); // Show success message
+        // Clear the form and close modal regardless of success
+        setNewStudentApp({
+            appType: '',
+            purpose: '',
+            date: '',
+            time: '',
+        });
+        setIsModalOpen(false);
+
+        if (data.success) {
+            // Show success message
+            await Swal.fire({
+                icon: 'success',
+                title: 'Appointment Created',
+                text: 'Your appointment has been successfully scheduled.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
+            });
+
+            // Refresh appointments list
+            fetchPendingAppointments();
+        } else {
+            throw new Error(data.message || 'Failed to create appointment');
+        }
     } catch (error) {
-        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Appointment Failed',
+            text: error.message || 'Failed to create appointment. Please try again.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#FFB703',
+        });
+    }
+
+    if(newStudentApp.appType == '' || newStudentApp.purpose == '' || newStudentApp.date == '' || newStudentApp.time == ''){
+        Swal.fire({
+            icon: 'error',
+            title: 'Appointment Failed',
+            text: 'Please fill up all the fields.',
+        });
     }
 };
 
-    
-
-    const onAppointment = () => {
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Just Wait for the Approval',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#FFB703',
-            customClass: {
-                confirmButton: 'swal-btn'
-            }
-        }).then(() => {
-            navigate("/dashboard");
-        });
-    };
 
     const handleDelete = async (id) => {
         Swal.fire({
@@ -249,11 +294,17 @@ const handleAddStudentApp = async (e) => {
     
         // If selected date is today, prevent past time slots
         if (selectedDate.toDateString() === currentDate.toDateString()) {
-            const [startHourStr] = editAppointment.time.split(" - ")[0].split(":");
-            const startHour = parseInt(startHourStr);
+            const [startTime] = editAppointment.time.split(" - ");
+            const [startHour, startMinute] = startTime.split(":").map(num => parseInt(num));
             const currentHour = currentDate.getHours();
-    
-            if (startHour <= currentHour) {
+            const currentMinute = currentDate.getMinutes();
+
+            // Convert to 24-hour format for PM times
+            const isPM = editAppointment.time.toLowerCase().includes('pm');
+            const adjustedStartHour = isPM && startHour !== 12 ? startHour + 12 : startHour;
+
+            if (adjustedStartHour < currentHour || 
+                (adjustedStartHour === currentHour && startMinute <= currentMinute)) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Invalid Time',
@@ -265,6 +316,18 @@ const handleAddStudentApp = async (e) => {
             }
         }
     
+        // Validate required fields
+        if (!editAppointment.appType || !editAppointment.purpose || !editAppointment.date || !editAppointment.time) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please fill up all the fields.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#FFB703',
+            });
+            return;
+        }
+    
         const confirmation = await Swal.fire({
             title: 'Are you sure?',
             text: 'Do you want to update this appointment?',
@@ -272,6 +335,7 @@ const handleAddStudentApp = async (e) => {
             showCancelButton: true,
             confirmButtonText: 'Yes, update it!',
             cancelButtonText: 'No, cancel!',
+            confirmButtonColor: '#FFB703',
         });
     
         if (confirmation.isConfirmed) {
@@ -279,22 +343,51 @@ const handleAddStudentApp = async (e) => {
                 const response = await fetch(`http://localhost:3001/appointments/${editAppointment._id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(editAppointment),
+                    body: JSON.stringify({
+                        appType: editAppointment.appType,
+                        purpose: editAppointment.purpose,
+                        date: editAppointment.date,
+                        time: editAppointment.time
+                    }),
                 });
-                if (!response.ok) throw new Error('Failed to update appointment');
-    
-                const updatedAppointments = appointments.map(app =>
-                    app._id === editAppointment._id ? editAppointment : app
-                );
-                setAppointments(updatedAppointments);
-                setIsEditing(false);
-                Swal.fire('Updated!', 'Your appointment has been updated.', 'success');
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to update appointment');
+                }
+
+                if (data.success) {
+                    const updatedAppointments = appointments.map(app =>
+                        app._id === editAppointment._id ? data.appointment : app
+                    );
+                    setAppointments(updatedAppointments);
+                    setIsEditing(false);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Your appointment has been updated.',
+                        confirmButtonColor: '#FFB703',
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to update appointment');
+                }
             } catch (error) {
                 console.error("Error updating appointment:", error);
-                Swal.fire('Error!', 'Failed to update the appointment.', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: error.message || 'Failed to update the appointment. Please try again.',
+                    confirmButtonColor: '#FFB703',
+                });
             }
         } else {
-            Swal.fire('Cancelled', 'The update was not applied.', 'info');
+            Swal.fire({
+                icon: 'info',
+                title: 'Cancelled',
+                text: 'The update was not applied.',
+                confirmButtonColor: '#FFB703',
+            });
         }
     };
     
@@ -302,32 +395,43 @@ const handleAddStudentApp = async (e) => {
     
 
     const availableTimeSlots = [
-        "8 - 9:00am",
-        "9 - 10:00am",
-        "10 - 11:00am",
-        "1 - 2:00pm",
-        "2 - 3:00pm",
-        "3 - 4:00pm",
+        "8:00 - 9:00am",
+        "9:00 - 10:00am",
+        "10:00 - 11:00am",
+        "1:00 - 2:00pm",
+        "2:00 - 3:00pm",
+        "3:00 - 4:00pm",
+
     ];
-    
+
     const getFilteredTimeSlots = () => {
         const currentDate = new Date();
         const selectedDate = new Date(newStudentApp.date);
-    
-        // Get the current time in 24-hour format
-        const currentHour = currentDate.getHours();
-    
+        
         // If the selected date is today, filter times
         if (selectedDate.toDateString() === currentDate.toDateString()) {
             return availableTimeSlots.filter((slot) => {
-                const [startHourStr] = slot.split(" - ")[0].split(":");
-                const startHour = parseInt(startHourStr);
-    
-                // Filter out time slots that are already in the past
-                return startHour > currentHour;
+                const [startTime] = slot.split(" - ");
+                const [startHour, startMinute] = startTime.split(":").map(num => parseInt(num));
+                const currentHour = currentDate.getHours();
+                const currentMinute = currentDate.getMinutes();
+
+                // Convert to 24-hour format for PM times
+                const isPM = slot.toLowerCase().includes('pm');
+                const adjustedStartHour = isPM && startHour !== 12 ? startHour + 12 : startHour;
+
+                // If the time has already passed, don't show the slot
+                if (adjustedStartHour < currentHour || 
+                    (adjustedStartHour === currentHour && startMinute <= currentMinute)) {
+                    return false;
+                }
+
+                return true;
             });
         }
-        return availableTimeSlots; // Return all time slots for future dates
+        
+        // For future dates, return all time slots
+        return availableTimeSlots;
     };
     
     
@@ -359,42 +463,42 @@ const handleAddStudentApp = async (e) => {
                             </tr>
                         </thead>
                         <tbody>
-    {appointments.length > 0 ? (
-        appointments.map((appointment) => (
-            <tr key={appointment.id} className='tr1'>
-                <td className='td1'>{appointment._id}</td> {/* Optional: Display an incrementing index */}
-                <td className='td1'>{appointment.appType}</td>
-                <td className='td1'>{appointment.purpose}</td>
-                <td className='td1'>{appointment.date}</td>
-                <td className='td1'>{appointment.time}</td>
-                <td className='td1'><p className='p-status'>{appointment.status}</p></td>
-                <td className='td1'>
-    <>
-    <div className="act">
-        <button 
-            className='edit-btn'
-            onClick={() => handleEdit(appointment)}
-        >
-            <MdEdit /> Edit
-        </button>
-        <button 
-            className='delete-btn'
-            onClick={() => handleDelete(appointment._id)}
-        >
-            <MdDelete /> Delete
-        </button>
-    </div>
-    </>
+                            {appointments.length > 0 ? (
+                                appointments.map((appointment) => (
+                                    <tr key={appointment.id} className='tr1'>
+                                        <td className='td1'>{appointment._id}</td> {/* Optional: Display an incrementing index */}
+                                        <td className='td1'>{appointment.appType}</td>
+                                        <td className='td1'>{appointment.purpose}</td>
+                                        <td className='td1'>{appointment.date}</td>
+                                        <td className='td1'>{appointment.time}</td>
+                                        <td className='td1'><p className='p-status'>{appointment.status}</p></td>
+                                        <td className='td1'>
+                            <>
+                            <div className="act">
+                                <button 
+                                    className='edit-btn'
+                                    onClick={() => handleEdit(appointment)}
+                                >
+                                    <MdEdit /> Edit
+                                </button>
+                                <button 
+                                    className='delete-btn'
+                                    onClick={() => handleDelete(appointment._id)}
+                                >
+                                    <MdDelete /> Delete
+                                </button>
+                            </div>
+                            </>
 
-                                            </td>
-            </tr>
-        ))
-    ) : (
-        <tr>
-            <td colSpan="7" className='td1'>No Appointments</td>
-        </tr>
-    )}
-</tbody>
+                             </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="7" className='td1'>No Appointments</td>
+                                </tr>
+                            )}
+                        </tbody>
 
                     </table>
                     </div>
@@ -403,34 +507,40 @@ const handleAddStudentApp = async (e) => {
                                 <div className="modal-content">
                                     <h2>Edit Appointment</h2>
                                     <label>Appointment Type</label>
+                                    <select 
+                                        className='time' 
+                                        name="appType" 
+                                        value={editAppointment.appType} 
+                                        onChange={(e) => setEditAppointment({ ...editAppointment, appType: e.target.value })}
+                                    >
+                                        <option value="">Select Type</option>
+                                        <option value="Individual">Individual</option>
+                                        <option value="Group">Group</option>
+                                    </select>
+                                    
+                                    <label>Purpose</label>
+                                    <select 
+                                        className='time' 
+                                        name="purpose" 
+                                        value={editAppointment.purpose} 
+                                        onChange={(e) => setEditAppointment({ ...editAppointment, purpose: e.target.value })}
+                                    >
+                                        <option value="">Select a purpose</option>
+                                        <option value="Academic Counseling">Academic Counseling</option>
+                                        <option value="Emotional Support">Emotional Support</option>
+                                        <option value="Career Guidance">Career Guidance</option>
+                                        <option value="Behavioral Concerns">Behavioral Concerns</option>
+                                    </select>
 
-                                    <select className='time' name="appType" value={editAppointment.appType} onChange={(e) => setEditAppointment({ ...editAppointment, appType: e.target.value })}>
-                                    <option value="">Select Type</option>
-                                    <option value="Individual">Individual</option>
-                                    <option value="Group">Group</option>
-                                </select>
-                            
-                                <label>Purpose</label>
-
-                                <select className='time' name="purpose" value={editAppointment.purpose} onChange={(e) => setEditAppointment({ ...editAppointment, purpose: e.target.value })}>
-                                    <option value="">Select a purpose</option>
-                                    <option value="Academic Counseling">Academic Counseling</option>
-                                    <option value="Emotional Support">Emotional Support</option>
-                                    <option value="Career Guidance">Career Guidance</option>
-                                    <option value="Behavioral Concerns">Behavioral Concerns</option>
-                                </select>
-
-
-                                <label>Date</label>
-                                <input
-                                    type="date"
-                                    value={editAppointment.date}
-                                    onChange={(e) => setEditAppointment({ ...editAppointment, date: e.target.value })}
-                                    min={getMinDate()} 
-                                />
+                                    <label>Date</label>
+                                    <input
+                                        type="date"
+                                        value={editAppointment.date}
+                                        onChange={(e) => setEditAppointment({ ...editAppointment, date: e.target.value })}
+                                        min={getMinDate()} 
+                                    />
 
                                     <label>Time</label>
-                                
                                     <select
                                         className="time"
                                         name="time"
@@ -445,7 +555,6 @@ const handleAddStudentApp = async (e) => {
                                         ))}
                                     </select>
 
-                           
                                     <button onClick={handleEditSubmit}>Save</button>
                                     <button onClick={() => setIsEditing(false)}>Cancel</button>
                                 </div>
@@ -510,7 +619,7 @@ const handleAddStudentApp = async (e) => {
                                     
                                 </div>
                                 <div className="div-btn">
-                                <button className='div-btns' onClick={onAppointment}>Confirm</button>
+                                <button className='div-btns' onClick={handleAddStudentApp}>Confirm</button>
                                 <button type="button" className='div-btns' onClick={() => setIsModalOpen(false)}>Cancel</button>
                                 </div>
                               

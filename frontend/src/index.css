@@ -1197,6 +1197,22 @@ background-color: #e8e8e8;
   min-height: 80px !important;
 }
 
+.fc-prev-button, .fc-next-button
+{
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 50px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.fc-prev-button:hover, .fc-next-button:hover
+{
+  opacity: 0.7;
+}
+
 .fc .fc-daygrid-day-number {
   font-size: 0.9em;
   padding: 3px 5px;
@@ -1624,6 +1640,23 @@ gap: 10px;
   background-color: #20c997;
   border-radius: 5px;
   color: white;
+}
+
+.drop 
+{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #000C6C;
+  cursor: pointer;
+  font-size: 15px;
+  color: gray;
+}
+
+.submit-btn
+{
+  background-color: #54b4d3;
+  color: white;
+  border: none;
 }
 
 

@@ -85,29 +85,41 @@ function Status() {
   };
 
   const handleDelete = async (staffId) => {
-    try {
-      const response = await fetch(`http://localhost:3001/admin/staff/${staffId}`, {
-        method: 'DELETE',
-      });
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`http://localhost:3001/admin/staff/${staffId}`, {
+            method: 'DELETE',
+          });
 
-      if (response.ok) {
-        setStaffList(staffList.filter((staff) => staff._id !== staffId));
-        Swal.fire({
-          icon: 'success',
-          title: 'Deleted',
-          text: 'Staff member removed successfully.',
-        });
-      } else {
-        throw new Error('Failed to delete staff');
+          if (response.ok) {
+            setStaffList(staffList.filter((staff) => staff._id !== staffId));
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted',
+              text: 'Staff member removed successfully.',
+            });
+          } else {
+            throw new Error('Failed to delete staff');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to delete staff.',
+          });
+        }
       }
-    } catch (error) {
-      console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'Failed to delete staff.',
-      });
-    }
+    });
   };
 
   return (
@@ -187,9 +199,7 @@ function Status() {
               <option value="Admin Clerk 3">Admin Clerk 3</option>
             </select>
             <br />
-            <button onClick={handleSubmit} className="submit-btn">
-              Add Staff
-            </button>
+            <input type="submit" value="Add Staff" className="submit-btn" onClick={handleSubmit}/>
           </div>
         </div>
       )}

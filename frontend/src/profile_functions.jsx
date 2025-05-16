@@ -133,7 +133,7 @@ function ProfileF() {
 
           <div className="prof1">
             <button>Account Overview</button>
-            <button onClick={handleEdit}>Edit Account</button>
+           {/* delete <button onClick={handleEdit}>Edit Account</button> */}
           </div>
         </div>
 

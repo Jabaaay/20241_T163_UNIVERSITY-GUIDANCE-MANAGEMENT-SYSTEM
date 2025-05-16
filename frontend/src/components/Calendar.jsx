@@ -3,6 +3,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+
 import NavBar from '../navbar';
 import Sidebar from '../sidebar';
 
@@ -260,9 +261,17 @@ function Calendar() {
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
               headerToolbar={{
-                left: 'prev,next today',
+                left: 'prev next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay',
+              }}
+              buttonText={{
+                today: 'Today',
+                month: 'Month',
+                week: 'Week',
+                day: 'Day',
+                prev: '<',
+                next: '>'
               }}
               events={appointments}
               eventContent={eventContent}
@@ -274,6 +283,7 @@ function Calendar() {
                 minute: '2-digit',
                 meridiem: false
               }}
+              
               slotMinTime="08:00:00"
               slotMaxTime="17:00:00"
               slotDuration="01:00:00"

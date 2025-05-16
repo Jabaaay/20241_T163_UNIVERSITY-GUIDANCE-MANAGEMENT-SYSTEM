@@ -3,6 +3,7 @@ import Announcement from '../models/annoucementModels.js';
 import Admin from "../models/admin.js";
 import Concerns from '../models/concerns.js';
 import Staff from '../models/staffModels.js';
+import jwt from 'jsonwebtoken';
 
 // get all appointments by the student
 const getHistory = async (req, res) => {
@@ -36,17 +37,38 @@ const confirmAppointment = async (req, res) => {
 const createAnnouncement = async (req, res) => {
   try {
       const { header, content } = req.body;
-      let fileUrl = '';
 
-      if (req.file) {
-          fileUrl = req.file.path;  // File URL after upload
-      }
+        // Validate header and content
+        if (!header || !header.trim()) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Header is required and cannot be empty' 
+            });
+        }
 
-      const announcement = new Announcement({ header, content, fileUrl });
-      await announcement.save();
-      res.status(201).json({ message: 'Announcement created successfully', announcement });
+        if (!content || !content.trim()) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Content is required and cannot be empty' 
+            });
+        }
+
+        // Create new announcement with trimmed values
+        const announcement = new Announcement({
+            header: header.trim(),
+            content: content.trim(),
+            fileUrl: req.file ? req.file.path : null
+        });
+
+        const savedAnnouncement = await announcement.save();
+        res.status(201).json(savedAnnouncement);
   } catch (error) {
-      res.status(500).json({ error: 'An error occurred while creating the announcement' });
+        console.error('Error creating announcement:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to create announcement',
+            error: error.message 
+        });
   }
 };
 
@@ -65,21 +87,73 @@ const handleGoogleLogin = async (req, res) => {
   const { googleId, name, email, picture, position } = req.body;
 
   try {
-    let user = await Admin.findOne({ googleId });
+    // Validate email domain
+    const allowedDomain = 'student.buksu.edu.ph';
+    const emailDomain = email.split('@')[1];
 
-    if (!user) {
-      // Create a new user if they don't exist
-      user = new Admin({ googleId, name, email, picture, position });
-      await user.save();
-    } else {
-      // Update the existing user
-      user.position = position || user.position;
-      await user.save();
+    if (emailDomain !== allowedDomain) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please use your BukSU student email (@student.buksu.edu.ph)'
+      });
     }
 
-    res.status(200).json({ user });
+    // Check if admin exists
+    let admin = await Admin.findOne({ googleId });
+
+    if (!admin) {
+      // Create a new admin if they don't exist
+      admin = new Admin({ 
+        googleId, 
+        name, 
+        email, 
+        picture, 
+        position: position || "Admin",
+        role: "Admin",
+        password: "google-auth" // Placeholder password for Google auth users
+      });
+      await admin.save();
+    } else {
+      // Update existing admin's information
+      admin.name = name;
+      admin.email = email;
+      admin.picture = picture;
+      await admin.save();
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        id: admin._id, 
+        role: admin.role,
+        googleId: admin.googleId 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // Return success response with token and admin data
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+        picture: admin.picture,
+        position: admin.position,
+        googleId: admin.googleId
+      }
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Google login error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error during login',
+      error: error.message 
+    });
   }
 };
 
@@ -111,14 +185,14 @@ const updateProfile = async (req, res) => {
 
 const getNotifications = async (req, res) => {
   try {
-    // Fetch notifications from the database
-    const notifications = await Concerns.find(); // Adjust the query as needed (e.g., limit or filter)
+    // Fetch notifications from the database and sort by date in descending order
+    const notifications = await Concerns.find().sort({ date: -1 });
     
     if (!notifications) {
       return res.status(404).json({ message: 'No notifications found' });
     }
 
-    res.status(200).json(notifications); // Send notifications as a response
+    res.status(200).json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);
     res.status(500).json({ message: 'Server error' });
@@ -207,8 +281,22 @@ const getStaff = async (req, res) => {
   }
 };
 
+const deleteStaff = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedStaff = await Staff.findByIdAndDelete(id);
+    if (!deletedStaff) {
+      return res.status(404).json({ message: 'Staff not found' });
+    }
+    res.status(200).json({ message: 'Staff deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete staff', error });
+  }
+};
 
 
 
 
-export {getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications, deleteNotification, deleteAnn, updateAnnouncement, getStaff};
+
+
+export {deleteStaff, getHistory, confirmAppointment, createAnnouncement, getAnnouncements, handleGoogleLogin, addStaff, updateProfile, getNotifications, deleteNotification, deleteAnn, updateAnnouncement, getStaff};

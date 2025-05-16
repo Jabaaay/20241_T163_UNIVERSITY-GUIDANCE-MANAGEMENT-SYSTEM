@@ -7,7 +7,6 @@ import logo from '../assets/1.png';
 import ReCAPTCHA from "react-google-recaptcha";
 import Swal from "sweetalert2";
 
-const clientId = "403785858213-teclugcpi5rmkocudnj0dqgk0h3j8f5n.apps.googleusercontent.com";
 const RECAPTCHA_SITE_KEY = "6LdndnoqAAAAAFIKS5elH66llnZvKoOmPIY21CNv";
 
 function Logins() {
@@ -38,7 +37,7 @@ function Logins() {
   const initClient = () => {
     window.gapi.client.init({
       apiKey: 'AIzaSyA_viGY4c2LAW1tXrIxGI5KDohhibrH52E',
-      clientId: clientId,
+      clientId: "403785858213-teclugcpi5rmkocudnj0dqgk0h3j8f5n.apps.googleusercontent.com",
       scope: "https://www.googleapis.com/auth/calendar",
     }).then(() => {
       const authInstance = window.gapi.auth2.getAuthInstance();
@@ -52,7 +51,7 @@ function Logins() {
     try {
       sessionStorage.clear();
       const decoded = jwtDecode(response.credential);
-      const res = await fetch('http://localhost:3001/admin/google-login', {
+      const res = await fetch('http://localhost:3001/staff/google-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,21 +67,49 @@ function Logins() {
       if (res.ok) {
         setToken(data.token);
         localStorage.setItem('token', data.token);
-        setUserInfo(data.admin);
-        sessionStorage.setItem('userInfo', JSON.stringify(data.admin));
+        setUserInfo(data.staff);
+        sessionStorage.setItem('userInfo', JSON.stringify(data.staff));
 
-        alert('Proceed to Profile for verification');
+        await Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'Proceed to Profile for verification',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#FFB703',
+        });
+
         navigate('/staff-Profile');
       } else {
         console.error('Error storing user:', data.error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: data.error || 'An error occurred during login',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#FFB703',
+        });
       }
     } catch (error) {
       console.error("Failed to decode token or store user:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'An error occurred during login',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#FFB703',
+      });
     }
   };
 
   const handleFailure = (error) => {
     console.log("Login failed", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: 'Google login failed. Please try again.',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#FFB703',
+    });
   };
 
   const loginAdmin = () => {
@@ -104,7 +131,7 @@ function Logins() {
 
   const handleInputChange = (e) => {
     setFormData({
-      ...formData,
+      ...formData,  
       [e.target.name]: e.target.value
     });
   };
@@ -175,7 +202,8 @@ function Logins() {
           whileHover={{ scale: 1.1 }}
         />
       </div>
-      
+      <a href="/" className="home-link" style={{color: 'white', textDecoration: 'none', 
+        fontSize: '1.2rem', fontWeight: 'bold'}}>Back</a>
     </motion.nav>
     <div className="bg">
       <motion.div
@@ -234,12 +262,8 @@ function Logins() {
               transition={{ delay: 0.3 }}
             >
               <GoogleLogin 
-                clientId={clientId}
-                buttonText="Login with Google"
                 onSuccess={handleSuccess}
-                onFailure={handleFailure}
-                cookiePolicy={'single-host-origin'}
-                isSignedIn={true}
+                onError={handleFailure}
               />
             </motion.div>
 

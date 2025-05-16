@@ -35,10 +35,43 @@ function Status() {
         fetchAnnouncements();
     }, []);
 
+    // Clear form state
+    const clearFormState = () => {
+        setHeader('');
+        setContent('');
+        setFile(null);
+        setEditingAnnouncement(null);
+        setVersion(null);
+    };
+
     const handlePost = async () => {
+        // Validate header and content
+        const trimmedHeader = header.trim();
+        const trimmedContent = content.trim();
+
+        if (!trimmedHeader) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Header',
+                text: 'Please enter a valid header for the announcement.',
+                confirmButtonColor: '#FFB703',
+            });
+            return;
+        }
+
+        if (!trimmedContent) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Content',
+                text: 'Please enter valid content for the announcement.',
+                confirmButtonColor: '#FFB703',
+            });
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('header', header);
-        formData.append('content', content);
+        formData.append('header', trimmedHeader);
+        formData.append('content', trimmedContent);
         if (file) formData.append('file', file);
 
         try {
@@ -50,21 +83,22 @@ function Status() {
             if (response.ok) {
                 const newAnnouncement = await response.json();
                 setAnnouncements((prev) => [...prev, newAnnouncement]);
-                setHeader('');
-                setContent('');
-                setFile(null);
-                setIsCreateModalOpen(false); // Close create modal after posting
+                clearFormState();
+                setIsCreateModalOpen(false);
 
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
                     text: 'Announcement posted successfully!',
+                    confirmButtonColor: '#FFB703',
                 });
             } else {
+                const errorData = await response.json();
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error posting announcement.',
+                    text: errorData.message || 'Error posting announcement.',
+                    confirmButtonColor: '#FFB703',
                 });
             }
         } catch (error) {
@@ -73,6 +107,7 @@ function Status() {
                 icon: 'error',
                 title: 'Error',
                 text: 'An error occurred while posting the announcement.',
+                confirmButtonColor: '#FFB703',
             });
         }
     };
@@ -121,7 +156,7 @@ function Status() {
         formData.append('header', header);
         formData.append('content', content);
         if (file) formData.append('file', file);
-        formData.append('__v', version); // Include version in the request
+        formData.append('__v', version);
     
         try {
             const response = await fetch(`http://localhost:3001/admin/announcements/${editingAnnouncement._id}`, {
@@ -136,6 +171,7 @@ function Status() {
                         announcement._id === updatedAnnouncement._id ? updatedAnnouncement : announcement
                     )
                 );
+                clearFormState();
                 setIsEditModalOpen(false);
                 Swal.fire('Success', 'Announcement updated successfully!', 'success');
             } else if (response.status === 409) {
@@ -149,6 +185,20 @@ function Status() {
         }
     };
     
+    const handleOpenCreateModal = () => {
+        clearFormState();
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCloseCreateModal = () => {
+        clearFormState();
+        setIsCreateModalOpen(false);
+    };
+
+    const handleCloseEditModal = () => {
+        clearFormState();
+        setIsEditModalOpen(false);
+    };
 
     return (
         <>
@@ -158,7 +208,7 @@ function Status() {
                 <div className="card3">
                     <div className="add">
                         <h1 className='my'>Announcement</h1>
-                        <button className='add-new' onClick={() => setIsCreateModalOpen(true)}>+ New Announcement</button>
+                        <button className='add-new' onClick={handleOpenCreateModal}>+ New Announcement</button>
                     </div>
                     <table className='t-announcement'>
                         <thead>
@@ -206,7 +256,7 @@ function Status() {
                     {isCreateModalOpen && (
                         <div className="modal">
                             <div className="modal-content">
-                                <span className="close" onClick={() => setIsCreateModalOpen(false)}>&times;</span>
+                                <span className="close" onClick={handleCloseCreateModal}>&times;</span>
                                 <h2>Create Announcement</h2>
                                 <input
                                     type="text"
@@ -243,7 +293,7 @@ function Status() {
                     {isEditModalOpen && (
                         <div className="modal">
                             <div className="modal-content">
-                                <span className="close" onClick={() => setIsEditModalOpen(false)}>&times;</span>
+                                <span className="close" onClick={handleCloseEditModal}>&times;</span>
                                 <h2>Edit Announcement</h2>
                                 <input
                                     type="text"

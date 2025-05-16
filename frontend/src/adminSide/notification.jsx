@@ -22,12 +22,8 @@ function Status({ updateUnreadCount }) {
         const response = await fetch('http://localhost:3001/admin/contact');
         if (response.ok) {
           const data = await response.json();
-          
-          // Sort notifications by date (most recent first)
-          const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-          
-          setNotifications(sortedData); // Set sorted notifications
-          setFilteredNotifications(sortedData); // Apply sorting to filtered notifications as well
+          setNotifications(data);
+          setFilteredNotifications(data);
         } else {
           console.error('Failed to fetch notifications');
         }
@@ -37,34 +33,47 @@ function Status({ updateUnreadCount }) {
         setLoading(false);
       }
     };
-  
+
     const fetchAppointments = async () => {
       try {
-        setLoading(true); // Start loading
+        setLoading(true);
         const response = await fetch('http://localhost:3001/admin/appointments');
         if (!response.ok) {
           throw new Error('Failed to fetch appointments');
         }
         const data = await response.json();
-  
+
+        // Sort appointments by date in descending order
+        const sortedData = data.sort((a, b) => new Date(b.dateNow) - new Date(a.dateNow));
+
         // Filter appointments by status
-        const pending = data.filter(appointment => appointment.status === 'Waiting for Approval');
-        const confirmed = data.filter(appointment => appointment.status === 'Confirmed');
-  
-        setPendingAppointments(pending); // No need to reverse here since we want FIFO
-        setConfirmedAppointments(confirmed); // No need to reverse here
+        const pending = sortedData.filter(appointment => appointment.status === 'Waiting for Approval');
+        const confirmed = sortedData.filter(appointment => appointment.status === 'Confirmed');
+
+        setPendingAppointments(pending);
+        setConfirmedAppointments(confirmed);
         setTotalAppointments(data.length);
       } catch (error) {
         console.error('Error fetching appointments:', error);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
-  
+
     fetchNotifications();
-    fetchAppointments(); // Fetch appointments on component mount
+    fetchAppointments();
   }, []);
-  
+
+  // Update filtered notifications when filter changes
+  useEffect(() => {
+    if (filter === 'all') {
+      setFilteredNotifications(notifications);
+    } else {
+      const filtered = notifications.filter(notification => notification.status === filter);
+      setFilteredNotifications(filtered);
+    }
+  }, [filter, notifications]);
+
   const handleNewNotification = (newNotification) => {
     // When a new notification arrives, add it to the top
     setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);

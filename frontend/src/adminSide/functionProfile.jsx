@@ -119,7 +119,6 @@ function ProfileF() {
 
           <div className="prof1">
             <button>Account Overview</button>
-            <button onClick={handleEdit}>Edit Account</button>
           </div>
         </div>
 
@@ -143,8 +142,8 @@ function ProfileF() {
               <td className='td2'>Position</td>
               <td className='td2'>
 
-
-                <select name="" id="" className='dropPos'
+    
+                <select name="" id="" className='dropPos' disabled={!editable}  
                   value={editable ? position : userData?.position}
                   onChange={(e) => setPosition(e.target.value)}
                   readOnly={!editable}>
